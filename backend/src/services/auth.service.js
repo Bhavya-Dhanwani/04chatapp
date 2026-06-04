@@ -26,7 +26,7 @@ async function loginService(email, password) {
     if (!newuser) throw new ApiError(404, "User not found. Please signup first");
 
     // Checking for the passowords
-    if (newuser.comparePassword(password)) throw new ApiError(401, "Invalid email or password");
+    if (newuser.comparePasswords(password)) throw new ApiError(401, "Invalid email or password");
 
     return newuser;
 }

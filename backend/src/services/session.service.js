@@ -9,7 +9,7 @@ async function createSessionService(userId) {
     let sessionId = new mongoose.Types.ObjectId();
 
     // generating a refresh token
-    const refresToken = generateRefreshToken(userId, sessionId);
+    const refreshToken = generateRefreshToken(userId, sessionId);
 
     // creating a session
     const session = await sessionModel.create({
@@ -19,7 +19,7 @@ async function createSessionService(userId) {
         expiresAt: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000))
     });
 
-    return { session, refresToken };
+    return { session, refreshToken };
 
 }
 

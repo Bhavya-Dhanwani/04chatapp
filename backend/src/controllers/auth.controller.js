@@ -21,7 +21,7 @@ async function signupController(req, res) {
     const accesstoken = generateAccessToken(newuser);
 
     // Setting the refresh token as cookie
-    res.cookies("chat_refresh_token", refreshToken, {
+    res.cookie("chat_refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
         path: "/api/auth/refresh"
@@ -48,7 +48,7 @@ async function loginController(req, res) {
     const accesstoken = generateAccessToken(newuser);
 
     // Setting the refresh token as cookie
-    res.cookies("chat_refresh_token", refreshToken, {
+    res.cookie("chat_refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
         path: "/api/auth/refresh"

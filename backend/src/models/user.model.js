@@ -2,8 +2,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { REFRESH_SECRET } from "../config/env.config";
-import { ACCESS_SECRET } from "../config/env.config";
 
 // Making the user Schema
 const userSchema = new mongoose.Schema(

@@ -1,6 +1,6 @@
 // Importing modules
 import jwt from "jsonwebtoken";
-import { ACCESS_SECRET, REFRESH_SECRET } from "../config/env.config";
+import { ACCESS_SECRET, REFRESH_SECRET } from "../config/env.config.js";
 
 // Functtion to generate the access token
 function generateAccessToken({ _id, name, email }) {

@@ -1,8 +1,8 @@
 // Function to sanitize the user and to send the data in a custom way
-function sanitizeUser({ name, eamil, _id}, accesstoken) {
+function sanitizeUser({ name, email, _id}, accesstoken) {
     return {
         name,
-        eamil,
+        email,
         id: _id,
         accesstoken: accesstoken
     }
