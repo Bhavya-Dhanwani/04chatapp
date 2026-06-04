@@ -17,4 +17,16 @@ function signupValidator(name, email, password) {
     if (!regex.test(email)) throw new ApiError(400, "Please enter a valid eamail");
 }
 
-export { signupValidator };
+function loginValidator(email, password) {
+
+    // Applying the validations
+    if (!email) throw new ApiError(400, "Email is required");
+
+    if (!password) throw new ApiError(400, "Password is required");
+
+    // Checking the email with the regex
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regex.test(email)) throw new ApiError(400, "Please enter a valid eamail");
+}
+
+export { signupValidator, loginValidator };

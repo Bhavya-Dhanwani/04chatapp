@@ -1,5 +1,6 @@
 import userModel from "../models/user.model.js";
-import { signupValidator } from "../validators/auth.validate.js";
+import ApiError from "../utils/ApiError.util.js";
+import { loginValidator, signupValidator } from "../validators/auth.validate.js";
 
 // signup service to create users
 async function signupService(name, email, password) {
@@ -13,4 +14,21 @@ async function signupService(name, email, password) {
     return newuser;
 }
 
-export { signupService };
+async function loginService(email, password) {
+
+    // Validating the data received
+    loginValidator(email, password);
+
+    // finding the user 
+    const newuser = await userModel.findOne({ email });
+
+    // retuning is the user is not found
+    if (!newuser) throw new ApiError(404, "User not found. Please signup first");
+
+    // Checking for the passowords
+    if (newuser.comparePassword(password)) throw new ApiError(401, "Invalid email or password");
+
+    return newuser;
+}
+
+export { signupService, loginService };
