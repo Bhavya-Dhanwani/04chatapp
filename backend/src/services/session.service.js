@@ -2,6 +2,7 @@
 import mongoose from "mongoose";
 import sessionModel from "../models/session.model.js";
 import { generateRefreshToken } from "../utils/token.util.js";
+import ApiError from "../utils/ApiError.util.js";
 
 async function createSessionService(userId) {
 
@@ -23,4 +24,20 @@ async function createSessionService(userId) {
 
 }
 
-export { createSessionService };
+async function deleteSessionService(refreshToken, sessionId) {
+
+    // Finding similar session and deleting
+    const deleted = await sessionModel.findOneAndDelete({
+        _id: sessionId,
+        refreshToken
+    });
+
+    // Checking if the session is delted?
+    if (!deleted) {
+        throw new ApiError(401, "Invalid session or refresh token");
+    }
+
+    return true;
+}
+
+export { createSessionService, deleteSessionService };

@@ -1,6 +1,6 @@
 // Importing modules
 import { loginService, signupService } from "../services/auth.service.js";
-import { createSessionService } from "../services/session.service.js";
+import { createSessionService, deleteSessionService } from "../services/session.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
@@ -24,7 +24,7 @@ async function signupController(req, res) {
     res.cookie("chat_refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
-        path: "/api/auth/refresh"
+        path: "/api/auth"
     });
 
     // Sending the res with accesstoken to get the accesstoken back as bearer authorizaiton
@@ -51,13 +51,24 @@ async function loginController(req, res) {
     res.cookie("chat_refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
-        path: "/api/auth/refresh"
+        path: "/api/auth"
     });
 
 
     // Sending the res with accesstoken to get the accesstoken back as bearer authorizaiton
     return Apiresponse(res, 200, "User Logged in Successfully", sanitizeUser(newuser, accesstoken));
 
+}
+
+async function logoutController(req, res) {
+
+    // getting the data
+    let { refreshToken, sessionId } = req.userPayload;
+
+    // giving data to the delete service to delete the token from DB
+    await deleteSessionService(refreshToken, sessionId);
+
+    return Apiresponse(res, 204, "User deleted Successfully");
 }
 
 export { signupController, loginController };

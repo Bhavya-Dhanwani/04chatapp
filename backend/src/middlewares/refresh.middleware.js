@@ -19,7 +19,7 @@ function getRefresh(req, res, next) {
         const payload = jwt.verify(token, REFRESH_SECRET);
 
         // setting the refreshtoken in the req
-        req.refreshToken = payload;
+        req.userPayload = payload;
     } catch (err) {
 
         // Throw err 401 if signature not verified
