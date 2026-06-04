@@ -24,12 +24,13 @@ async function createSessionService(userId) {
 
 }
 
-async function deleteSessionService(refreshToken, sessionId) {
+async function deleteSessionService(refreshToken, sessionId, userId) {
 
     // Finding similar session and deleting
     const deleted = await sessionModel.findOneAndDelete({
         _id: sessionId,
-        refreshToken
+        refreshToken,
+        userId
     });
 
     // Checking if the session is delted?
@@ -40,4 +41,16 @@ async function deleteSessionService(refreshToken, sessionId) {
     return true;
 }
 
-export { createSessionService, deleteSessionService };
+async function deleteAllSessions(userId) {
+
+    // Finding and delteing the sessions
+    const deleted = await sessionModel.deleteMany({
+        userId
+    });
+
+    if (deleted.deletedCount == 0) throw new ApiError(404, "No sessions found");
+
+    return true
+}
+
+export { createSessionService, deleteSessionService, deleteAllSessions };

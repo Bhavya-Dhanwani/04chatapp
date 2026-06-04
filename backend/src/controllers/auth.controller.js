@@ -1,6 +1,6 @@
 // Importing modules
 import { loginService, signupService } from "../services/auth.service.js";
-import { createSessionService, deleteSessionService } from "../services/session.service.js";
+import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
@@ -63,12 +63,24 @@ async function loginController(req, res) {
 async function logoutController(req, res) {
 
     // getting the data
-    let { refreshToken, sessionId } = req.userPayload;
+    let { refreshToken, sessionId, userId } = req.userPayload;
 
     // giving data to the delete service to delete the token from DB
-    await deleteSessionService(refreshToken, sessionId);
+    await deleteSessionService(refreshToken, sessionId, userId);
 
-    return Apiresponse(res, 204, "User deleted Successfully");
+    // retuning the response
+    return Apiresponse(res, 204, "Session deleted Successfully");
 }
 
-export { signupController, loginController };
+async function logoutAllController(req, res) {
+
+    // getting the data
+    let { userId } = req.userPayload;
+    
+    // giving the data to the service to delte the sessions running
+    await deleteAllSessions(userId);
+    
+    return Apiresponse(res, 204, "Sessions deleted Successfully");
+}
+
+export { signupController, loginController, logoutController, logoutAllController };
