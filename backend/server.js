@@ -1,6 +1,7 @@
 // Importing moduels
 import app from "./src/app.js";
+import { PORT } from "./src/config/env.config.js";
 
-app.listen(5000, () => {
+app.listen(PORT, () => {
     console.log("Server is running");
 });
