@@ -40,18 +40,24 @@ userSchema.pre("save", function () {
     this.password = bcrypt.hashSync(this.password, 10);
 });
 
-// Adding the post methods to add the 
+// Adding the post methods to generate the refresh token
 userSchema.methods.generateRefreshToken = function () {
     return jwt.sign({ id: this._id }, REFRESH_SECRET, {
         expiresIn: "7d"
     });
 }
 
+// Adding the post methods to generate the access token
 userSchema.methods.generateAccessToken = function () {
     return jwt.sign({ id: this._id, email: this.email, name: this.name }, ACCESS_SECRET, {
         expiresIn: "30m"
     });
 }
 
+userSchema.methods.comparePasswords = function(password) {
+    return bcrypt.compareSync(password, this.password);
+}
+
 // Making the model
-const useModel = await new mongoose.model("users", userSchema);
+const userModel = await new mongoose.model("users", userSchema);
+export default userModel;
