@@ -192,6 +192,11 @@ async function refreshController(req, res) {
 
 }
 
+// Function to get current user from access token
+async function meController(req, res) {
+    return Apiresponse(res, 200, "User fetched successfully", sanitizeUser(req.user));
+}
+
 export {
     signupController,
     loginController,
@@ -200,5 +205,6 @@ export {
     otpCheckController,
     resendOtpController,
     forgotPasswordController,
-    resetPasswordController
+    resetPasswordController,
+    meController
 };
