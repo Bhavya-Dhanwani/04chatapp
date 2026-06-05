@@ -1,0 +1,105 @@
+.authContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #000;
+    font-size: 14px;
+}
+
+.authBox {
+    width: 350px;
+    background-color: #000;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    padding: 40px 40px 20px;
+    text-align: center;
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 12px;
+    object-fit: contain;
+}
+
+.title {
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #8e8e8e;
+    font-size: 13px;
+    margin-bottom: 4px;
+    line-height: 1.4;
+}
+
+.emailText {
+    color: #0095f6;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 8px 16px;
+    background-color: #0095f6;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 8px;
+}
+
+.submitBtn:hover {
+    background-color: #1877f2;
+}
+
+.submitBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.resendSection {
+    margin-top: 20px;
+}
+
+.resendBtn {
+    background: none;
+    border: none;
+    color: #0095f6;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.resendBtn:hover:not(:disabled) {
+    color: #1877f2;
+}
+
+.resendBtn:disabled {
+    color: #737373;
+    cursor: not-allowed;
+}
+
+.errorText {
+    color: #ed4956;
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.successText {
+    color: #00c853;
+    font-size: 12px;
+    margin-top: 10px;
+    text-align: center;
+}

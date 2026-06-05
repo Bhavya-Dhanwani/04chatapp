@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useSignup } from "../../hooks/useSignup";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { signup, clearError } from "../../state/authSlice";
+import { useToast } from "../../../../shared/ui/jsx/Toast";
 import styles from "../css/Signup.module.css";
 import Image from "next/image";
 import { HiOutlineMail } from "react-icons/hi";
@@ -12,11 +15,22 @@ function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const { signup, loading, error } = useSignup();
+    const router = useRouter();
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.auth);
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await signup(name, email, password);
+        dispatch(clearError());
+
+        const result = await dispatch(signup({ name, email, password }));
+        if (signup.fulfilled.match(result)) {
+            toast.success("Account created", "Please verify your email");
+            router.push("/verify");
+        } else {
+            toast.error("Signup failed", result.payload);
+        }
     };
 
     return (

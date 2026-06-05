@@ -5,7 +5,10 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useMe } from "../../hooks/useMe";
 
-export default function AuthRoute({ children }) {
+const PUBLIC_ROUTES = ["/login", "/signup"];
+const VERIFY_ROUTE = "/verify";
+
+export default function ProtectedRoute({ children }) {
     const router = useRouter();
     const { user, loading } = useMe();
     const { user: reduxUser } = useSelector((state) => state.auth);
@@ -15,12 +18,16 @@ export default function AuthRoute({ children }) {
     const isVerified = currentUser?.isVerified;
 
     useEffect(() => {
-        if (!loading && isLoggedIn) {
-            if (isVerified) {
-                router.push("/");
-            } else {
-                router.push("/verify");
-            }
+        if (loading) return;
+
+        if (!isLoggedIn) {
+            router.push("/login");
+            return;
+        }
+
+        if (!isVerified) {
+            router.push("/verify");
+            return;
         }
     }, [loading, isLoggedIn, isVerified, router]);
 
@@ -32,7 +39,7 @@ export default function AuthRoute({ children }) {
         );
     }
 
-    if (isLoggedIn) {
+    if (!isLoggedIn || !isVerified) {
         return null;
     }
 

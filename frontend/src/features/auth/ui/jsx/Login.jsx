@@ -1,7 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useLogin } from "../../hooks/useLogin";
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { login, clearError } from "../../state/authSlice";
+import { useToast } from "../../../../shared/ui/jsx/Toast";
 import styles from "../css/Login.module.css";
 import Image from "next/image";
 import { HiOutlineMail } from "react-icons/hi";
@@ -11,11 +14,27 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
-    const { login, loading, error } = useLogin();
+    const router = useRouter();
+    const dispatch = useDispatch();
+    const { loading, error } = useSelector((state) => state.auth);
+    const toast = useToast();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await login(email, password);
+        dispatch(clearError());
+
+        const result = await dispatch(login({ email, password }));
+        if (login.fulfilled.match(result)) {
+            toast.success("Welcome back", "Logged in successfully");
+            const user = result.payload.data;
+            if (user?.isVerified) {
+                router.push("/");
+            } else {
+                router.push("/verify");
+            }
+        } else {
+            toast.error("Login failed", result.payload);
+        }
     };
 
     return (
@@ -65,7 +84,7 @@ function Login() {
                         </button>
                     </div>
 
-                    <a href="#" className={styles.forgotLink}>Forgot Password?</a>
+                    <a href="/forgotpassword" className={styles.forgotLink}>Forgot Password?</a>
 
                     <button
                         className={styles.submitBtn}
