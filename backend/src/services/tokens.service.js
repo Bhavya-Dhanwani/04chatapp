@@ -1,6 +1,7 @@
 // Importing modules
 import { generateOTP } from "../utils/random.util.js";
 import otpModel from "../models/otp.model.js";
+import ApiError from "../utils/ApiError.util.js";
 
 // funciton to generate and set otps
 async function getOtp(userId, sessionId) {
@@ -9,7 +10,7 @@ async function getOtp(userId, sessionId) {
     let otp = generateOTP();
 
     // Setting the otp in the db
-    const otpSet = await otpMode.createl({
+    const otpSet = await otpModel.create({
         userId, sessionId, otp
     });
 
@@ -17,4 +18,19 @@ async function getOtp(userId, sessionId) {
 
 }
 
-export { getOtp };
+// function to check the otp from db
+async function checkOtp(userId, sessionId, otp) {
+
+    // finding the otp matching userId, sessionId and otp
+    const otpFound = await otpModel.findOneAndDelete({
+        userId, sessionId, otp
+    });
+
+    // checking if otp exists
+    if (!otpFound) throw new ApiError(400, "Invalid or expired OTP");
+
+    return true;
+
+}
+
+export { getOtp, checkOtp };

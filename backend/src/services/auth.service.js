@@ -31,4 +31,13 @@ async function loginService(email, password) {
     return newuser;
 }
 
-export { signupService, loginService };
+// service to update user isVerified
+async function updateVerified(userId) {
+
+    // updating the user isVerified to true
+    await userModel.findByIdAndUpdate(userId, { isVerified: true });
+
+    return true;
+}
+
+export { signupService, loginService, updateVerified };

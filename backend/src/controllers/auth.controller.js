@@ -1,10 +1,9 @@
 // Importing modules
-import { loginService, signupService } from "../services/auth.service.js";
+import { loginService, signupService, updateVerified } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
-import { getOtp } from "../services/tokens.service.js";
+import { checkOtp } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
-import sendMail from "../utils/sendMail.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
 
 // Function to make the signup functionality
@@ -83,10 +82,28 @@ async function logoutAllController(req, res) {
     // getting the data
     let { userId } = req.userPayload;
     
-    // giving the data to the service to delte the sessions running
+    // giving data to the service to delte the sessions running
     await deleteAllSessions(userId);
     
     return Apiresponse(res, 204, "Sessions deleted Successfully");
 }
 
-export { signupController, loginController, logoutController, logoutAllController };
+// function to verify the otp
+async function otpCheckController(req, res) {
+
+    // getting the data from req
+    let { userId, sessionId } = req.userPayload;
+    let { otp } = req.body;
+
+    // checking the otp from db
+    await checkOtp(userId, sessionId, otp);
+
+    // updating the user isVerified to true
+    await updateVerified(userId);
+
+    // returning the response
+    return Apiresponse(res, 200, "User verified successfully");
+
+}
+
+export { signupController, loginController, logoutController, logoutAllController, otpCheckController };
