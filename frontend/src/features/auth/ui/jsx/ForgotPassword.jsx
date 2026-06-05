@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useToast } from "../../../../shared/ui/jsx/Toast";
 import api from "../../../../app/api";
+import Link from "next/link";
 import styles from "../css/ForgotPassword.module.css";
 import { HiOutlineMail } from "react-icons/hi";
 
@@ -59,9 +60,9 @@ function ForgotPassword() {
                             We&apos;ve sent a password reset link to <strong>{email}</strong>.
                             Please check your inbox and spam folder.
                         </p>
-                        <a href="/login" className={styles.loginLink}>
+                        <Link href="/login" className={styles.loginLink}>
                             Back to Login
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -101,9 +102,9 @@ function ForgotPassword() {
                     </button>
                 </form>
 
-                <a href="/login" className={styles.backLink}>
+                <Link href="/login" className={styles.backLink}>
                     Back to Login
-                </a>
+                </Link>
             </div>
         </div>
     );

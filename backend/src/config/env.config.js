@@ -13,5 +13,5 @@ export const SMTP_SERVICE = process.env.SMTP_SERVICE || "";
 export const SMTP_PORT = process.env.SMTP_PORT || 587;
 export const SMTP_USER = process.env.SMTP_USER || "";
 export const SMTP_PASS = process.env.SMTP_PASS || "";
-export const TRANSACTION_MAIL = process.env.TRANSACTION_MAIL || "";
+export const TRANSACTION_MAIL = process.env.TRANSACTIONAL_EMAIL || "";
 export const FRONTEND_URL = process.env.FRONTEND_URL || "";

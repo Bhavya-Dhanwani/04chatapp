@@ -1,5 +1,5 @@
 // Importing modules
-import { loginService, resetPassword, signupService, updateVerified } from "../services/auth.service.js";
+import { loginService, resetPassword, signupService, updateVerified, findUserByEmail } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService, refreshService } from "../services/session.service.js";
 import { checkOtp, createResetToken, deleteOtp, getOtp, verifyResetToken } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
@@ -19,12 +19,12 @@ async function signupController(req, res) {
     const newuser = await signupService(name, email, password);
 
     // using sessions service to create session
-    const { refreshToken, session } = createSessionService(newuser._id);
+    const { refreshToken, session } = await createSessionService(newuser._id);
 
     // geenrating the access token
     const accesstoken = generateAccessToken(newuser);
 
-    const otp = getOtp(newuser._id, session._id);
+    const otp = await getOtp(newuser._id, session._id);
 
     sendMail(email, "Otp to for acc verficaiton", `<h1>${otp.otp}</h1>`);
 
@@ -50,7 +50,7 @@ async function loginController(req, res) {
     const newuser = await loginService(email, password);
 
     // using sessions service to create session
-    const { refreshToken, session } = createSessionService(newuser._id);
+    const { refreshToken, session } = await createSessionService(newuser._id);
 
     // geenrating the access token
     const accesstoken = generateAccessToken(newuser);
@@ -135,20 +135,28 @@ async function resendOtpController(req, res) {
 // function to send forgot password link
 async function forgotPasswordController(req, res) {
 
-    // getting the user id from req
-    let { userId } = req.userPayload;
+    // getting the email from req body
+    let { email } = req.body;
+
+    // finding the user by email
+    const user = await findUserByEmail(email);
+
+    // if user not found, still return success for security
+    if (!user) {
+        return Apiresponse(res, 200, "If an account exists with this email, a reset link has been sent");
+    }
 
     // creating a reset token
-    const resetToken = await createResetToken(userId);
+    const resetToken = await createResetToken(user._id);
 
     // making the magic link
-    const resetLink = `${FRONTEND_URL}/reset/${resetToken.token}`;
+    const resetLink = `${FRONTEND_URL}/resetpassword/${resetToken.token}`;
 
     // sending the mail with the link
-    await sendMail(req.user.email, "Reset your password", `<h1>Click here to reset your password</h1><a href="${resetLink}">${resetLink}</a>`);
+    await sendMail(email, "Reset your password", `<h1>Click here to reset your password</h1><a href="${resetLink}">${resetLink}</a>`);
 
     // returning the response
-    return Apiresponse(res, 200, "Reset link sent to your email");
+    return Apiresponse(res, 200, "If an account exists with this email, a reset link has been sent");
 
 }
 
@@ -206,5 +214,6 @@ export {
     resendOtpController,
     forgotPasswordController,
     resetPasswordController,
-    meController
+    meController,
+    refreshController
 };

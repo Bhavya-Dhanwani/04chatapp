@@ -7,6 +7,7 @@ import { signup, clearError } from "../../state/authSlice";
 import { useToast } from "../../../../shared/ui/jsx/Toast";
 import styles from "../css/Signup.module.css";
 import Image from "next/image";
+import Link from "next/link";
 import { HiOutlineMail } from "react-icons/hi";
 import { RiLockLine, RiEyeLine, RiEyeOffLine, RiUserLine } from "react-icons/ri";
 
@@ -112,7 +113,7 @@ function Signup() {
 
                 <div className={styles.loginBox}>
                     <span>
-                        Already have an account?<a href="/login">Log In</a>
+                        Already have an account?<Link href="/login">Log In</Link>
                     </span>
                 </div>
             </div>

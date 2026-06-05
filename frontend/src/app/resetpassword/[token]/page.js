@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import ResetPassword from "../../features/auth/ui/jsx/ResetPassword";
+import ResetPassword from "../../../features/auth/ui/jsx/ResetPassword";
 
 function ResetPasswordContent() {
     return <ResetPassword />;

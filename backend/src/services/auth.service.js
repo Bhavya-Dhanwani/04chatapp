@@ -40,6 +40,15 @@ async function updateVerified(userId) {
     return true;
 }
 
+// service to find user by email
+async function findUserByEmail(email) {
+
+    // finding the user by email
+    const user = await userModel.findOne({ email });
+
+    return user;
+}
+
 // service to reset password
 async function resetPassword(userId, newPassword) {
 
@@ -59,4 +68,4 @@ async function resetPassword(userId, newPassword) {
     return true;
 }
 
-export { signupService, loginService, updateVerified, resetPassword };
+export { signupService, loginService, updateVerified, resetPassword, findUserByEmail };

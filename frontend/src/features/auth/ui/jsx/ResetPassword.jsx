@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useToast } from "../../../../shared/ui/jsx/Toast";
 import api from "../../../../app/api";
+import Link from "next/link";
 import styles from "../css/ResetPassword.module.css";
 import { RiLockLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 
 function ResetPassword() {
-    const searchParams = useSearchParams();
+    const params = useParams();
     const router = useRouter();
-    const token = searchParams.get("token");
+    const token = params.token;
     const toast = useToast();
 
     const [password, setPassword] = useState("");
@@ -98,9 +99,9 @@ function ResetPassword() {
                         <p className={styles.successMessage}>
                             Your password has been reset successfully. Redirecting to login...
                         </p>
-                        <a href="/login" className={styles.loginLink}>
+                        <Link href="/login" className={styles.loginLink}>
                             Go to Login
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

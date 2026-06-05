@@ -1,7 +1,7 @@
 // Importing the modules
 import express from "express";
 import asyncWraper from "../utils/asyncwrapper.util.js";
-import { forgotPasswordController, loginController, logoutAllController, logoutController, meController, otpCheckController, resendOtpController, resetPasswordController, signupController } from "../controllers/auth.controller.js";
+import { forgotPasswordController, loginController, logoutAllController, logoutController, meController, otpCheckController, refreshController, resendOtpController, resetPasswordController, signupController } from "../controllers/auth.controller.js";
 import getRefresh from "../middlewares/refresh.middleware.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
@@ -11,11 +11,12 @@ const authRouter = express.Router();
 // Adding the routes
 authRouter.post("/signup", asyncWraper(signupController));
 authRouter.post("/login", asyncWraper(loginController));
+authRouter.post("/refresh", getRefresh, asyncWraper(refreshController));
 authRouter.delete("/logout", getRefresh, asyncWraper(logoutController));
 authRouter.delete("/logoutall", getRefresh, asyncWraper(logoutAllController));
 authRouter.post("/verify", authMiddleware(true), getRefresh, asyncWraper(otpCheckController));
 authRouter.post("/resendOtp", authMiddleware(true), getRefresh, asyncWraper(resendOtpController));
-authRouter.post("/forgotpassword", authMiddleware(), getRefresh, asyncWraper(forgotPasswordController));
+authRouter.post("/forgotpassword", asyncWraper(forgotPasswordController));
 authRouter.post("/resetpassword", asyncWraper(resetPasswordController));
 authRouter.get("/me", authMiddleware(), asyncWraper(meController));
 

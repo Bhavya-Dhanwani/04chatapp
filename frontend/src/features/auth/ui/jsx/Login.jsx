@@ -7,6 +7,7 @@ import { login, clearError } from "../../state/authSlice";
 import { useToast } from "../../../../shared/ui/jsx/Toast";
 import styles from "../css/Login.module.css";
 import Image from "next/image";
+import Link from "next/link";
 import { HiOutlineMail } from "react-icons/hi";
 import { RiLockLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 
@@ -84,7 +85,7 @@ function Login() {
                         </button>
                     </div>
 
-                    <a href="/forgotpassword" className={styles.forgotLink}>Forgot Password?</a>
+                    <Link href="/forgotpassword" className={styles.forgotLink}>Forgot Password?</Link>
 
                     <button
                         className={styles.submitBtn}
@@ -105,7 +106,7 @@ function Login() {
 
                 <div className={styles.signupBox}>
                     <span>
-                        Don&apos;t have an account?<a href="/signup">Sign Up</a>
+                        Don&apos;t have an account?<Link href="/signup">Sign Up</Link>
                     </span>
                 </div>
             </div>
