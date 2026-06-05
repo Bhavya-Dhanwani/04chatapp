@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { verify, resendOtp, clearError } from "../../state/authSlice";
+import { useToast } from "../../../../shared/ui/jsx/Toast";
 import OtpInput from "./OtpInput";
 import styles from "../css/Verify.module.css";
 
@@ -11,10 +12,10 @@ function Verify() {
     const [otp, setOtp] = useState("");
     const [countdown, setCountdown] = useState(60);
     const [resendLoading, setResendLoading] = useState(false);
-    const [resendMessage, setResendMessage] = useState("");
     const router = useRouter();
     const dispatch = useDispatch();
     const { user, loading, error } = useSelector((state) => state.auth);
+    const toast = useToast();
 
     useEffect(() => {
         if (countdown > 0) {
@@ -29,22 +30,26 @@ function Verify() {
 
         const result = await dispatch(verify(otp));
         if (verify.fulfilled.match(result)) {
+            toast.success("Verified", "Account verified successfully");
             router.push("/");
+        } else {
+            toast.error("Verification failed", result.payload);
         }
     };
 
     const handleResend = useCallback(async () => {
         setResendLoading(true);
-        setResendMessage("");
         dispatch(clearError());
 
         const result = await dispatch(resendOtp());
         if (resendOtp.fulfilled.match(result)) {
-            setResendMessage("OTP resent successfully");
+            toast.success("OTP sent", "OTP resent successfully");
             setCountdown(60);
+        } else {
+            toast.error("Failed", result.payload);
         }
         setResendLoading(false);
-    }, [dispatch]);
+    }, [dispatch, toast]);
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
@@ -72,7 +77,6 @@ function Verify() {
                 </button>
 
                 {error && <p className={styles.errorText}>{error}</p>}
-                {resendMessage && <p className={styles.successText}>{resendMessage}</p>}
 
                 <div className={styles.resendSection}>
                     {countdown > 0 ? (
