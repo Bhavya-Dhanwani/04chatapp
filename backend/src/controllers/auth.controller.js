@@ -1,11 +1,13 @@
 // Importing modules
 import { loginService, signupService, updateVerified } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
-import { checkOtp, deleteOtp, getOtp } from "../services/tokens.service.js";
+import { checkOtp, createResetToken, deleteOtp, getOtp } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import ApiError from "../utils/ApiError.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
+import sendMail from "../utils/sendMail.util.js";
+import { FRONTEND_URL } from "../config/env.config.js";
 
 // Function to make the signup functionality
 async function signupController(req, res) {
@@ -130,4 +132,24 @@ async function resendOtpController(req, res) {
 
 }
 
-export { signupController, loginController, logoutController, logoutAllController, otpCheckController, resendOtpController };
+// function to send forgot password link
+async function forgotPasswordController(req, res) {
+
+    // getting the user id from req
+    let { userId } = req.userPayload;
+
+    // creating a reset token
+    const resetToken = await createResetToken(userId);
+
+    // making the magic link
+    const resetLink = `${FRONTEND_URL}/reset/${resetToken.token}`;
+
+    // sending the mail with the link
+    await sendMail(req.user.email, "Reset your password", `<h1>Click here to reset your password</h1><a href="${resetLink}">${resetLink}</a>`);
+
+    // returning the response
+    return Apiresponse(res, 200, "Reset link sent to your email");
+
+}
+
+export { signupController, loginController, logoutController, logoutAllController, otpCheckController, resendOtpController, forgotPasswordController };

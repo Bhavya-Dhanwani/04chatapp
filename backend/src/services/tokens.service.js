@@ -1,6 +1,7 @@
 // Importing modules
-import { generateOTP } from "../utils/random.util.js";
+import { generateOTP, generateRandomToken } from "../utils/random.util.js";
 import otpModel from "../models/otp.model.js";
+import resetTokenModel from "../models/resetToken.model.js";
 import ApiError from "../utils/ApiError.util.js";
 
 // funciton to generate and set otps
@@ -43,4 +44,22 @@ async function deleteOtp(userId, sessionId) {
 
 }
 
-export { getOtp, checkOtp, deleteOtp };
+// function to create reset token
+async function createResetToken(userId) {
+
+    // generating a random token
+    const token = generateRandomToken();
+
+    // deleting old reset tokens for the user
+    await resetTokenModel.deleteMany({ userId });
+
+    // saving the token in db
+    const resetToken = await resetTokenModel.create({
+        userId, token
+    });
+
+    return resetToken;
+
+}
+
+export { getOtp, checkOtp, deleteOtp, createResetToken };

@@ -14,4 +14,26 @@ function generateOTP(length = 6) {
     return otp;
 }
 
-export { generateOTP }
+// function to generate random alphanumeric token
+function generateRandomToken(length = 32) {
+
+    // characters to use for the token
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    // holding the token
+    let token = "";
+
+    // looping to build the token
+    for (let i = 0; i < length; i++) {
+
+        // picking a random index
+        const index = Math.floor(Math.random() * chars.length);
+
+        // appending the character
+        token += chars[index];
+    }
+
+    return token;
+}
+
+export { generateOTP, generateRandomToken }
