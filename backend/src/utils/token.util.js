@@ -3,14 +3,15 @@ import jwt from "jsonwebtoken";
 import { ACCESS_SECRET, REFRESH_SECRET } from "../config/env.config.js";
 
 // Functtion to generate the access token
-function generateAccessToken({ _id, name, email }) {
+function generateAccessToken({ _id, name, email, isVerified }) {
 
     // generating a returning the token
     return jwt.sign(
         {
             id: _id,
             name,
-            email
+            email,
+            isVerified
         },
         ACCESS_SECRET,
         {

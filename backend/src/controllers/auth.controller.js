@@ -1,8 +1,10 @@
 // Importing modules
 import { loginService, signupService } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
+import { getOtp } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
+import sendMail from "../utils/sendMail.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
 
 // Function to make the signup functionality
@@ -19,6 +21,10 @@ async function signupController(req, res) {
 
     // geenrating the access token
     const accesstoken = generateAccessToken(newuser);
+
+    const otp = getOtp(newuser._id, session._id);
+
+    sendMail(email, "Otp to for acc verficaiton", `<h1>${otp.otp}</h1>`);
 
     // Setting the refresh token as cookie
     res.cookie("chat_refresh_token", refreshToken, {
