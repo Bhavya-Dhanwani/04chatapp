@@ -1,5 +1,7 @@
+// Importing the moduels
 import mongoose from "mongoose";
 
+// Making the message schema to store messages
 const messageSchema = new mongoose.Schema(
     {
         chatId: {
@@ -31,9 +33,12 @@ const messageSchema = new mongoose.Schema(
     }
 );
 
+// Indeing using chat id to get the messages faster
 messageSchema.index({
     chatId: 1,
     createdAt: -1
 });
 
-export default mongoose.model("messages", messageSchema);
+// Making the model of the message
+const messageMoedl = mongoose.model("messages", messageSchema);
+export default messageMoedl;

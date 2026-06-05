@@ -1,6 +1,6 @@
 // Importing modules
 import nodemailer from "nodemailer";
-import { SMTP_PASS, SMTP_PORT, SMTP_SERVICE, SMTP_USER } from "./env.config";
+import { SMTP_PASS, SMTP_PORT, SMTP_SERVICE, SMTP_USER } from "./env.config.js";
 
 // Making a transporter to send the mails
 const transporter = nodemailer.createTransport({

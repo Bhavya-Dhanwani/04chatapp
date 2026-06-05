@@ -1,5 +1,7 @@
+// Importing modules
 import mongoose from "mongoose";
 
+// Making the chat schema to save chats
 const chatSchema = new mongoose.Schema(
     {
         participants: [
@@ -21,6 +23,8 @@ const chatSchema = new mongoose.Schema(
     }
 );
 
+// Index the chats for searchin optimization
 chatSchema.index({ participants: 1 });
 
-export default mongoose.model("chats", chatSchema);
+const chatModel =  mongoose.model("chats", chatSchema);
+export default chatModel;

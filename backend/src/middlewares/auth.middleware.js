@@ -3,7 +3,7 @@ import ApiError from "../utils/ApiError.util.js";
 import checkForToken from "../utils/checkFortoken.util.js";
 
 // function for the middleware 
-async function authMiddleware(skipVerify = false) {
+function authMiddleware(skipVerify = false) {
 
     // returning a function to get user input 
     return (req, res, next) => {
@@ -20,3 +20,6 @@ async function authMiddleware(skipVerify = false) {
         next();
     }
 }
+
+
+export default authMiddleware;
