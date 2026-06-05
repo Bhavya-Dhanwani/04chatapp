@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useSignup } from "../../hooks/useSignup";
 import styles from "../css/Signup.module.css";
 import Image from "next/image";
+import { HiOutlineMail } from "react-icons/hi";
+import { RiLockLine, RiEyeLine, RiEyeOffLine, RiUserLine } from "react-icons/ri";
 
 function Signup() {
     const [name, setName] = useState("");
@@ -23,8 +25,8 @@ function Signup() {
                 <Image
                     src="/logo.png"
                     alt="Logo"
-                    width={80}
-                    height={80}
+                    width={60}
+                    height={60}
                     className={styles.logo}
                 />
                 <h1 className={styles.appName}>meelmilap</h1>
@@ -33,7 +35,9 @@ function Signup() {
 
                 <form onSubmit={handleSubmit}>
                     <div className={styles.inputGroup}>
-                        <span className={styles.inputIcon}>👤</span>
+                        <span className={styles.inputIcon}>
+                            <RiUserLine />
+                        </span>
                         <input
                             className={styles.inputField}
                             type="text"
@@ -43,7 +47,9 @@ function Signup() {
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <span className={styles.inputIcon}>✉</span>
+                        <span className={styles.inputIcon}>
+                            <HiOutlineMail />
+                        </span>
                         <input
                             className={styles.inputField}
                             type="email"
@@ -53,7 +59,9 @@ function Signup() {
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <span className={styles.inputIcon}>🔒</span>
+                        <span className={styles.inputIcon}>
+                            <RiLockLine />
+                        </span>
                         <input
                             className={styles.inputField}
                             type={showPassword ? "text" : "password"}
@@ -66,7 +74,7 @@ function Signup() {
                             className={styles.eyeIcon}
                             onClick={() => setShowPassword(!showPassword)}
                         >
-                            {showPassword ? "👁" : "👁‍🗨"}
+                            {showPassword ? <RiEyeOffLine /> : <RiEyeLine />}
                         </button>
                     </div>
                     <p className={styles.passwordHint}>Password must be at least 6 characters</p>

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useLogin } from "../../hooks/useLogin";
 import styles from "../css/Login.module.css";
 import Image from "next/image";
+import { HiOutlineMail } from "react-icons/hi";
+import { RiLockLine, RiEyeLine, RiEyeOffLine } from "react-icons/ri";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -22,8 +24,8 @@ function Login() {
                 <Image
                     src="/logo.png"
                     alt="Logo"
-                    width={80}
-                    height={80}
+                    width={60}
+                    height={60}
                     className={styles.logo}
                 />
                 <h1 className={styles.appName}>meelmilap</h1>
@@ -32,7 +34,9 @@ function Login() {
 
                 <form onSubmit={handleSubmit}>
                     <div className={styles.inputGroup}>
-                        <span className={styles.inputIcon}>✉</span>
+                        <span className={styles.inputIcon}>
+                            <HiOutlineMail />
+                        </span>
                         <input
                             className={styles.inputField}
                             type="email"
@@ -42,7 +46,9 @@ function Login() {
                         />
                     </div>
                     <div className={styles.inputGroup}>
-                        <span className={styles.inputIcon}>🔒</span>
+                        <span className={styles.inputIcon}>
+                            <RiLockLine />
+                        </span>
                         <input
                             className={styles.inputField}
                             type={showPassword ? "text" : "password"}
@@ -55,7 +61,7 @@ function Login() {
                             className={styles.eyeIcon}
                             onClick={() => setShowPassword(!showPassword)}
                         >
-                            {showPassword ? "👁" : "👁‍🗨"}
+                            {showPassword ? <RiEyeOffLine /> : <RiEyeLine />}
                         </button>
                     </div>
 
