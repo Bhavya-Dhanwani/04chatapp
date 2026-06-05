@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 
 // making the schema for otps
-const otpSchema = mongoose.Schema(
+const otpSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,

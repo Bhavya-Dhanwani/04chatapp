@@ -2,7 +2,7 @@
 import mongoose from "mongoose";
 
 // making the schema for reset tokens
-const resetTokenSchema = mongoose.Schema(
+const resetTokenSchema = new mongoose.Schema(
     {
         userId: {
             type: mongoose.Schema.Types.ObjectId,
