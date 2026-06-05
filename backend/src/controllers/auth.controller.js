@@ -1,7 +1,7 @@
 // Importing modules
-import { loginService, signupService, updateVerified } from "../services/auth.service.js";
+import { loginService, resetPassword, signupService, updateVerified } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
-import { checkOtp, createResetToken, deleteOtp, getOtp } from "../services/tokens.service.js";
+import { checkOtp, createResetToken, deleteOtp, getOtp, verifyResetToken } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import ApiError from "../utils/ApiError.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
@@ -152,4 +152,24 @@ async function forgotPasswordController(req, res) {
 
 }
 
-export { signupController, loginController, logoutController, logoutAllController, otpCheckController, resendOtpController, forgotPasswordController };
+// function to reset password using token
+async function resetPasswordController(req, res) {
+
+    // getting the token from body
+    let { token } = req.body;
+
+    // getting the new password from body
+    let { newPassword } = req.body;
+
+    // verifying the reset token and getting the userId
+    const tokenFound = await verifyResetToken(token);
+
+    // resetting the password
+    await resetPassword(tokenFound.userId, newPassword);
+
+    // returning the response
+    return Apiresponse(res, 200, "Password reset successfully");
+
+}
+
+export { signupController, loginController, logoutController, logoutAllController, otpCheckController, resendOtpController, forgotPasswordController, resetPasswordController };

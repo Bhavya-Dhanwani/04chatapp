@@ -40,4 +40,23 @@ async function updateVerified(userId) {
     return true;
 }
 
-export { signupService, loginService, updateVerified };
+// service to reset password
+async function resetPassword(userId, newPassword) {
+
+    // finding the user
+    const user = await userModel.findById(userId);
+
+    // checking if user exists
+    if (!user) throw new ApiError(404, "User not found");
+
+    // checking if new password is same as old
+    if (user.comparePasswords(newPassword)) throw new ApiError(400, "New password cannot be the same as the old password");
+
+    // updating the password
+    user.password = newPassword;
+    await user.save();
+
+    return true;
+}
+
+export { signupService, loginService, updateVerified, resetPassword };

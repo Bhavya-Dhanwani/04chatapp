@@ -62,4 +62,17 @@ async function createResetToken(userId) {
 
 }
 
-export { getOtp, checkOtp, deleteOtp, createResetToken };
+// function to verify reset token
+async function verifyResetToken(token) {
+
+    // finding the token and deleting it
+    const tokenFound = await resetTokenModel.findOneAndDelete({ token });
+
+    // checking if token exists
+    if (!tokenFound) throw new ApiError(400, "Invalid or expired token");
+
+    return tokenFound;
+
+}
+
+export { getOtp, checkOtp, deleteOtp, createResetToken, verifyResetToken };
