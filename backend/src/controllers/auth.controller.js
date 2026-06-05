@@ -1,8 +1,9 @@
 // Importing modules
 import { loginService, signupService, updateVerified } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
-import { checkOtp } from "../services/tokens.service.js";
+import { checkOtp, deleteOtp, getOtp } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
+import ApiError from "../utils/ApiError.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
 
@@ -91,6 +92,9 @@ async function logoutAllController(req, res) {
 // function to verify the otp
 async function otpCheckController(req, res) {
 
+    // checking if user is already verified
+    if (req.user.isVerified) throw new ApiError(400, "User is already verified");
+
     // getting the data from req
     let { userId, sessionId } = req.userPayload;
     let { otp } = req.body;
@@ -106,4 +110,24 @@ async function otpCheckController(req, res) {
 
 }
 
-export { signupController, loginController, logoutController, logoutAllController, otpCheckController };
+// function to resend the otp
+async function resendOtpController(req, res) {
+
+    // checking if user is already verified
+    if (req.user.isVerified) throw new ApiError(400, "User is already verified");
+
+    // getting the data from req
+    let { userId, sessionId } = req.userPayload;
+
+    // deleting the old otp
+    await deleteOtp(userId, sessionId);
+
+    // generating a new otp
+    const newOtp = await getOtp(userId, sessionId);
+
+    // returning the response
+    return Apiresponse(res, 200, "OTP resent successfully");
+
+}
+
+export { signupController, loginController, logoutController, logoutAllController, otpCheckController, resendOtpController };

@@ -33,4 +33,14 @@ async function checkOtp(userId, sessionId, otp) {
 
 }
 
-export { getOtp, checkOtp };
+// function to delete old otps for a session
+async function deleteOtp(userId, sessionId) {
+
+    // deleting old otps matching userId and sessionId
+    await otpModel.deleteMany({ userId, sessionId });
+
+    return true;
+
+}
+
+export { getOtp, checkOtp, deleteOtp };
