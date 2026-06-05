@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { authApi } from "../api/authApi";
+import { setAccessToken, clearAccessToken } from "../../../app/tokenStore";
 
 export const login = createAsyncThunk("auth/login", async ({ email, password }, { rejectWithValue }) => {
     try {
@@ -32,6 +33,7 @@ const authSlice = createSlice({
         },
         logout: (state) => {
             state.user = null;
+            clearAccessToken();
         },
     },
     extraReducers: (builder) => {
@@ -43,6 +45,9 @@ const authSlice = createSlice({
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload.data;
+                if (action.payload.accessToken) {
+                    setAccessToken(action.payload.accessToken);
+                }
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;
@@ -55,6 +60,9 @@ const authSlice = createSlice({
             .addCase(signup.fulfilled, (state, action) => {
                 state.loading = false;
                 state.user = action.payload.data;
+                if (action.payload.accessToken) {
+                    setAccessToken(action.payload.accessToken);
+                }
             })
             .addCase(signup.rejected, (state, action) => {
                 state.loading = false;
