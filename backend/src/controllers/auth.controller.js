@@ -1,6 +1,6 @@
 // Importing modules
 import { loginService, resetPassword, signupService, updateVerified } from "../services/auth.service.js";
-import { createSessionService, deleteAllSessions, deleteSessionService } from "../services/session.service.js";
+import { createSessionService, deleteAllSessions, deleteSessionService, refreshService } from "../services/session.service.js";
 import { checkOtp, createResetToken, deleteOtp, getOtp, verifyResetToken } from "../services/tokens.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import ApiError from "../utils/ApiError.util.js";
@@ -84,10 +84,10 @@ async function logoutAllController(req, res) {
 
     // getting the data
     let { userId } = req.userPayload;
-    
+
     // giving data to the service to delte the sessions running
     await deleteAllSessions(userId);
-    
+
     return Apiresponse(res, 204, "Sessions deleted Successfully");
 }
 
@@ -172,4 +172,33 @@ async function resetPasswordController(req, res) {
 
 }
 
-export { signupController, loginController, logoutController, logoutAllController, otpCheckController, resendOtpController, forgotPasswordController, resetPasswordController };
+async function refreshController(req, res) {
+
+    // getting the data
+    let { refreshToken, sessionId, userId } = req.userPayload;
+
+    // using the refreshService to validate the tokens 
+    let { newaccessToken, newRefreshToken } = await refreshService(refreshToken, sessionId, userId); 
+
+    // Setting the refresh token as cookie
+    res.cookie("chat_refresh_token", newRefreshToken, {
+        httpOnly: true,
+        secure: true,
+        path: "/api/auth"
+    });
+
+    // returnning the new access token
+    return Apiresponse(res, 200, "Rotated token successfully", newaccessToken);
+
+}
+
+export {
+    signupController,
+    loginController,
+    logoutController,
+    logoutAllController,
+    otpCheckController,
+    resendOtpController,
+    forgotPasswordController,
+    resetPasswordController
+};
