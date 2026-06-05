@@ -2,6 +2,7 @@
 import express from "express";
 import connectDB from "./config/db.config.js";
 import cookieParser from "cookie-parser";
+import corsMiddleware from "./middlewares/cors.middleware.js";
 import errorMiddleware from "./middlewares/error.middleware.js";
 import indexRouter from "./routes/index.route.js";
 
@@ -12,6 +13,7 @@ const app = express();
 connectDB();
 
 // Adding the middleware
+app.use(corsMiddleware);
 app.use(express.json());
 app.use(cookieParser());
 

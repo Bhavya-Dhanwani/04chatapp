@@ -1,5 +1,12 @@
+"use client";
+
+import AuthRoute from "../../features/auth/ui/jsx/AuthRoute";
 import Login from "../../features/auth/ui/jsx/Login";
 
 export default function LoginPage() {
-    return <Login />;
+    return (
+        <AuthRoute>
+            <Login />
+        </AuthRoute>
+    );
 }
