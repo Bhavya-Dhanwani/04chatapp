@@ -12,6 +12,18 @@ const chatSchema = new mongoose.Schema(
             }
         ],
 
+        chatType: {
+            type: String,
+            enum: ["direct", "group"],
+            default: "direct"
+        },
+
+        name: {
+            type: String,
+            trim: true,
+            default: ""
+        },
+
         lastMessage: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "messages",
@@ -23,8 +35,9 @@ const chatSchema = new mongoose.Schema(
     }
 );
 
-// Index the chats for searchin optimization
+// Index the chats for searching optimization
 chatSchema.index({ participants: 1 });
+chatSchema.index({ chatType: 1, name: 1 });
 
 const chatModel =  mongoose.model("chats", chatSchema);
 export default chatModel;

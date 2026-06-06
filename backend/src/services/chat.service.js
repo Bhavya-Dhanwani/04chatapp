@@ -6,8 +6,19 @@ import userModel from "../models/user.model.js";
 import "../models/message.model.js";
 import ApiError from "../utils/ApiError.util.js";
 
+// Global chat constants
+const GLOBAL_CHAT_NAME = "Global";
+const GLOBAL_CHAT_TYPE = "group";
+
 // Service to fetch all chats for a given user, with participants and last message populated
 async function getChatsService(userId) {
+
+    // Ensure the user is in the global chat before fetching (best-effort, don't crash if it fails)
+    try {
+        await addToGlobalChat(userId);
+    } catch {
+        // If global chat setup fails, still return the user's chats
+    }
 
     // Querying chats where the user is a participant, newest activity first
     const chats = await chatModel
@@ -53,4 +64,36 @@ async function accessOrCreateChatService(userId, otherUserId) {
     return chat;
 }
 
-export { getChatsService, accessOrCreateChatService };
+// Service to ensure the global group chat exists (creates it if missing)
+async function ensureGlobalChatExists() {
+    let globalChat = await chatModel.findOne({
+        chatType: GLOBAL_CHAT_TYPE,
+        name: GLOBAL_CHAT_NAME
+    });
+
+    if (!globalChat) {
+        globalChat = await chatModel.create({
+            participants: [],
+            chatType: GLOBAL_CHAT_TYPE,
+            name: GLOBAL_CHAT_NAME
+        });
+    }
+
+    return globalChat;
+}
+
+// Service to add a user to the global group chat
+async function addToGlobalChat(userId) {
+    const globalChat = await ensureGlobalChatExists();
+
+    // Only add if user is not already a participant (compare as strings)
+    const alreadyIn = globalChat.participants.some((p) => String(p) === String(userId));
+    if (!alreadyIn) {
+        globalChat.participants.push(userId);
+        await globalChat.save();
+    }
+
+    return globalChat;
+}
+
+export { getChatsService, accessOrCreateChatService, ensureGlobalChatExists, addToGlobalChat };

@@ -2,6 +2,7 @@
 import { loginService, resetPassword, signupService, updateVerified, findUserByEmail } from "../services/auth.service.js";
 import { createSessionService, deleteAllSessions, deleteSessionService, refreshService } from "../services/session.service.js";
 import { checkOtp, createResetToken, deleteOtp, getOtp, verifyResetToken } from "../services/tokens.service.js";
+import { addToGlobalChat } from "../services/chat.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import ApiError from "../utils/ApiError.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
@@ -18,6 +19,9 @@ async function signupController(req, res) {
 
     // Using the signup service to valdiate and create the user
     const newuser = await signupService(name, email, password, profilePic, profilePicId);
+
+    // Adding the new user to the global group chat
+    await addToGlobalChat(newuser._id);
 
     // using sessions service to create session
     const { refreshToken, session } = await createSessionService(newuser._id);

@@ -1,11 +1,14 @@
 // Importing modules
 import express from "express";
 import asyncWraper from "../utils/asyncwrapper.util.js";
-import { changePasswordController, changeProfilePicController, getRandomUsersController } from "../controllers/user.controller.js";
+import { changePasswordController, changeProfilePicController, getRandomUsersController, searchUsersController } from "../controllers/user.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 
 // Making the router
 const userRouter = express.Router();
+
+// GET /api/users/search?q=query  - search users by name (requires verified access token)
+userRouter.get("/search", authMiddleware(), asyncWraper(searchUsersController));
 
 // GET /api/users/random  - return a random sample of verified users (requires verified access token)
 userRouter.get("/random", authMiddleware(), asyncWraper(getRandomUsersController));

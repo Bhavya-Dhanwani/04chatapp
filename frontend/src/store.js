@@ -8,4 +8,8 @@ export const makeStore = () =>
             auth: authReducer,
             chat: chatReducer,
         },
+        middleware: (getDefaultMiddleware) =>
+            getDefaultMiddleware({
+                serializableCheck: false,
+            }),
     });

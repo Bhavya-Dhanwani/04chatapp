@@ -23,12 +23,15 @@ function formatTime(timestamp) {
 }
 
 // Component representing a single conversation row in the chat list
-function ChatListItem({ chat, currentUserId, isSelected, onClick }) {
+function ChatListItem({ chat, currentUserId, isSelected, onClick, isOnline, unreadCount }) {
 
-    // Finding the "other" participant for one-on-one chats (fallback to first participant)
-    const otherParticipant = chat.participants?.find((p) => p?._id !== currentUserId) || chat.participants?.[0];
+    // Determining if this is a group chat
+    const isGroup = chat.chatType === "group";
 
-    // Computing the display name (chat may eventually have a group name)
+    // For group chats, use the group name; for direct chats, find the other participant
+    const otherParticipant = isGroup ? null : chat.participants?.find((p) => p?._id !== currentUserId) || chat.participants?.[0];
+
+    // Computing the display name
     const displayName = chat.name || otherParticipant?.name || "Unknown";
 
     // Computing the first letter for the avatar fallback
@@ -38,23 +41,39 @@ function ChatListItem({ chat, currentUserId, isSelected, onClick }) {
     const lastMessage = chat.lastMessage?.content || "";
     const timestamp = formatTime(chat.lastMessage?.createdAt || chat.updatedAt);
 
+    // Whether to show the online indicator (only for direct chats, not self)
+    const showOnline = !isGroup && isOnline;
+
+    // Avatar: group chats show the initial; direct chats show the other participant's PFP
+    const avatarContent = isGroup ? (
+        <span className={styles.avatarInitial}>{initial}</span>
+    ) : otherParticipant?.profilePic ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={otherParticipant.profilePic} alt="" className={styles.avatarImg} />
+    ) : (
+        <span className={styles.avatarInitial}>{initial}</span>
+    );
+
     return (
         <li
             className={`${styles.item} ${isSelected ? styles.itemActive : ""}`}
             onClick={onClick}
         >
             <div className={styles.avatar}>
-                {otherParticipant?.profilePic ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={otherParticipant.profilePic} alt="" className={styles.avatarImg} />
-                ) : (
-                    <span className={styles.avatarInitial}>{initial}</span>
-                )}
+                {avatarContent}
+                {showOnline && <span className={styles.onlineDot} />}
             </div>
             <div className={styles.content}>
                 <div className={styles.topRow}>
                     <span className={styles.name}>{displayName}</span>
-                    {timestamp && <span className={styles.time}>{timestamp}</span>}
+                    <div className={styles.topRight}>
+                        {timestamp && <span className={styles.time}>{timestamp}</span>}
+                        {unreadCount > 0 && (
+                            <span className={styles.unreadBadge}>
+                                {unreadCount > 99 ? "99+" : unreadCount}
+                            </span>
+                        )}
+                    </div>
                 </div>
                 <div className={styles.bottomRow}>
                     <span className={styles.preview}>{lastMessage || "Say hi"}</span>

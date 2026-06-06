@@ -33,4 +33,14 @@ export const userApi = {
         // Returning the response data
         return data;
     },
+
+    // Function to search users by name
+    searchUsers: async (query, limit = 10) => {
+
+        // Sending get request to backend with the search query
+        const { data } = await api.get("/users/search", { params: { q: query, limit } });
+
+        // Returning the response data
+        return data;
+    },
 };

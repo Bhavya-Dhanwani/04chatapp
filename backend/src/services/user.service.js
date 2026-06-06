@@ -81,4 +81,23 @@ async function getRandomUsersService(userId, limit) {
     return users;
 }
 
-export { changePasswordService, changeProfilePicService, getRandomUsersService };
+// Service to search users by name (used by the search bar to find users to chat with)
+async function searchUsersService(userId, query, limit = 10) {
+    const safeQuery = (query || "").trim();
+    if (!safeQuery) return [];
+
+    const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 20);
+
+    const users = await userModel
+        .find({
+            _id: { $ne: new mongoose.Types.ObjectId(userId) },
+            name: { $regex: safeQuery, $options: "i" }
+        })
+        .select("name profilePic isVerified")
+        .limit(safeLimit)
+        .lean();
+
+    return users;
+}
+
+export { changePasswordService, changeProfilePicService, getRandomUsersService, searchUsersService };

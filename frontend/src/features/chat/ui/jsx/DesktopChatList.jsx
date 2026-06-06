@@ -1,7 +1,7 @@
 "use client";
 
 // Importing hooks from react
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 
 // Importing hooks from react-redux
 import { useDispatch, useSelector } from "react-redux";
@@ -10,7 +10,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RiArrowDownSLine, RiEditBoxLine, RiSearchLine, RiLockPasswordLine, RiUserSettingsLine, RiUserLine } from "react-icons/ri";
 
 // Importing chat slice action
-import { fetchChats } from "../../state/chatSlice";
+import { fetchChats, accessOrCreateChat } from "../../state/chatSlice";
+
+// Importing user API
+import { userApi } from "../../../user/api/userApi";
 
 // Importing the change-password / change-profile-pic modals
 import ChangePasswordModal from "../../../user/ui/jsx/ChangePasswordModal";
@@ -37,6 +40,44 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
 
     // Local state for search input
     const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    // User search results for the search bar
+    const [searchResults, setSearchResults] = useState([]);
+    const [searching, setSearching] = useState(false);
+
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => setDebouncedSearch(search), 300);
+        return () => clearTimeout(timer);
+    }, [search]);
+
+    // Fetch user search results when debouncedSearch changes
+    useEffect(() => {
+        if (!debouncedSearch.trim()) {
+            setSearchResults([]);
+            return;
+        }
+
+        let cancelled = false;
+
+        const fetchResults = async () => {
+            setSearching(true);
+            try {
+                const res = await userApi.searchUsers(debouncedSearch, 10);
+                if (!cancelled) {
+                    setSearchResults(res.data || []);
+                }
+            } catch {
+                if (!cancelled) setSearchResults([]);
+            } finally {
+                if (!cancelled) setSearching(false);
+            }
+        };
+
+        fetchResults();
+        return () => { cancelled = true; };
+    }, [debouncedSearch]);
 
     // Dropdown + modal state
     const [menuOpen, setMenuOpen] = useState(false);
@@ -51,7 +92,7 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
 
     // Getting dispatch and chat state from redux
     const dispatch = useDispatch();
-    const { chats, loading, error, loaded } = useSelector((state) => state.chat);
+    const { chats, loading, error, loaded, onlineUsers, unreadCounts } = useSelector((state) => state.chat);
 
     // Getting current user for the username header
     const { user } = useSelector((state) => state.auth);
@@ -81,10 +122,13 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
         return () => window.removeEventListener("mousedown", handleClick);
     }, [menuOpen]);
 
-    // Filtering chats by search query against each participant's name
+    // Filtering chats by search query against group name or participant names
+    // Excludes group chats (like Global) so they don't visually overlap the "People" results
     const filteredChats = chats.filter((chat) => {
-        if (!search.trim()) return true;
-        const q = search.trim().toLowerCase();
+        if (!debouncedSearch.trim()) return true;
+        if (chat.chatType === "group") return false;
+        const q = debouncedSearch.trim().toLowerCase();
+        if (chat.name?.toLowerCase().includes(q)) return true;
         return chat.participants?.some((p) => p?.name?.toLowerCase().includes(q));
     });
 
@@ -97,6 +141,20 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
     // When a chat is created via the discovery modal, select it so the right panel opens it
     const handleChatCreated = (chat) => {
         if (chat) onSelectChat?.(chat);
+    };
+
+    // Handler for clicking a user search result — creates/opens a chat with that user
+    const handleUserClick = async (userId) => {
+        try {
+            const result = await dispatch(accessOrCreateChat(userId)).unwrap();
+            if (result) {
+                setSearch("");
+                setDebouncedSearch("");
+                onSelectChat?.(result);
+            }
+        } catch (err) {
+            console.error("Failed to create/open chat:", err);
+        }
     };
 
     // Menu item handlers (close dropdown, open the matching modal)
@@ -122,26 +180,98 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
 
     // Determining what to render in the body area
     let body;
+    const isSearching = debouncedSearch.trim().length > 0;
+
     if (loading && !loaded) {
         body = <p className={styles.statusMsg}>Loading chats...</p>;
     } else if (error) {
         body = <p className={styles.statusMsg}>Couldn&apos;t load chats.</p>;
-    } else if (chats.length === 0) {
+    } else if (chats.length === 0 && !isSearching) {
         body = <EmptyChats onMakeFriends={handleMakeFriends} />;
+    } else if (isSearching) {
+        // Show user search results + matching chats
+        body = (
+            <>
+                {searchResults.length > 0 && (
+                    <div className={styles.searchSection}>
+                        <span className={styles.searchSectionLabel}>People</span>
+                        <ul className={styles.chatList}>
+                            {searchResults.map((u) => {
+                                const uInitial = (u.name || "?").charAt(0).toUpperCase();
+                                return (
+                                    <li
+                                        key={u._id}
+                                        className={styles.searchUserItem}
+                                        onClick={() => handleUserClick(u._id)}
+                                    >
+                                        <div className={styles.searchUserAvatar}>
+                                            {u.profilePic ? (
+                                                // eslint-disable-next-line @next/next/no-img-element
+                                                <img src={u.profilePic} alt="" className={styles.searchUserAvatarImg} />
+                                            ) : (
+                                                <span className={styles.searchUserInitial}>{uInitial}</span>
+                                            )}
+                                        </div>
+                                        <span className={styles.searchUserName}>{u.name}</span>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    </div>
+                )}
+                {filteredChats.length > 0 && (
+                    <div className={styles.searchSection}>
+                        <span className={styles.searchSectionLabel}>Chats</span>
+                        <ul className={styles.chatList}>
+                            {filteredChats.map((chat) => {
+                                const otherUserId = chat.participants?.find((p) => p?._id !== user?.id)?._id;
+                                const isOnline = otherUserId ? !!onlineUsers[otherUserId] : false;
+                                const unreadCount = unreadCounts[chat._id] || 0;
+                                return (
+                                    <ChatListItem
+                                        key={chat._id}
+                                        chat={chat}
+                                        currentUserId={user?.id}
+                                        isSelected={selectedChatId === chat._id}
+                                        onClick={() => onSelectChat?.(chat)}
+                                        isOnline={isOnline}
+                                        unreadCount={unreadCount}
+                                    />
+                                );
+                            })}
+                        </ul>
+                    </div>
+                )}
+                {!searching && searchResults.length === 0 && filteredChats.length === 0 && (
+                    <p className={styles.statusMsg}>No results for &quot;{debouncedSearch}&quot;</p>
+                )}
+                {searching && searchResults.length === 0 && (
+                    <p className={styles.statusMsg}>Searching...</p>
+                )}
+            </>
+        );
     } else if (filteredChats.length === 0) {
-        body = <p className={styles.statusMsg}>No chats match &quot;{search}&quot;</p>;
+        body = <p className={styles.statusMsg}>No chats match &quot;{debouncedSearch}&quot;</p>;
     } else {
         body = (
             <ul className={styles.chatList}>
-                {filteredChats.map((chat) => (
-                    <ChatListItem
-                        key={chat._id}
-                        chat={chat}
-                        currentUserId={user?.id}
-                        isSelected={selectedChatId === chat._id}
-                        onClick={() => onSelectChat?.(chat)}
-                    />
-                ))}
+                {filteredChats.map((chat) => {
+                    const otherUserId = chat.participants?.find((p) => p?._id !== user?.id)?._id;
+                    const isOnline = otherUserId ? !!onlineUsers[otherUserId] : false;
+                    const unreadCount = unreadCounts[chat._id] || 0;
+
+                    return (
+                        <ChatListItem
+                            key={chat._id}
+                            chat={chat}
+                            currentUserId={user?.id}
+                            isSelected={selectedChatId === chat._id}
+                            onClick={() => onSelectChat?.(chat)}
+                            isOnline={isOnline}
+                            unreadCount={unreadCount}
+                        />
+                    );
+                })}
             </ul>
         );
     }

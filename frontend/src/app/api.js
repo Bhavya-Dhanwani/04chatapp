@@ -42,8 +42,8 @@ api.interceptors.response.use(
         // Getting original request config
         const originalRequest = error.config;
 
-        // Checking if error is 401 and request hasn't been retried
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        // Checking if error is 401 or 403 and request hasn't been retried
+        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
 
             // Marking request as retried
             originalRequest._retry = true;
@@ -71,7 +71,11 @@ api.interceptors.response.use(
                 // Logging refresh error for debugging
                 console.log("Token refresh error:", refreshError);
 
-                // Refresh failed, rejecting original error
+                // Refresh failed — clear token and redirect to login
+                clearAccessToken();
+                if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+                    window.location.href = "/login";
+                }
             }
         }
 

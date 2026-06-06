@@ -157,6 +157,19 @@
     white-space: nowrap;
 }
 
+/* Online user avatar with green ring */
+.noteAvatarOnline {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    border: 2px solid #00c853;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
 .body {
     flex: 1;
     display: flex;
@@ -176,4 +189,65 @@
     text-align: center;
     padding: 24px 16px;
     margin: 0;
+}
+
+/* Search results sections */
+.searchSection {
+    padding: 4px 0;
+}
+
+.searchSectionLabel {
+    display: block;
+    padding: 8px 16px 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #8e8e8e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.searchUserItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    list-style: none;
+}
+
+.searchUserItem:hover {
+    background-color: #121212;
+}
+
+.searchUserAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    border: 1px solid #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.searchUserAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.searchUserInitial {
+    font-size: 14px;
+    font-weight: 600;
+    color: #d9d9d9;
+}
+
+.searchUserName {
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
 }

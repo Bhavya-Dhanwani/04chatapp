@@ -1,6 +1,6 @@
 // Importing moduels
 import app from "./src/app.js";
-import initSocket from "./src/sockets/socket.server.js";
+import { initSocket } from "./src/sockets/socket.server.js";
 import { PORT } from "./src/config/env.config.js";
 import { createServer } from "http";
 
