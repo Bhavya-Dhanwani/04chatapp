@@ -13,4 +13,14 @@ export const chatApi = {
         // Returning the response data
         return data;
     },
+
+    // Function to find an existing 1:1 chat with another user, or create a new one if none exists
+    accessOrCreateChat: async (userId) => {
+
+        // Sending post request to backend with the target user id
+        const { data } = await api.post("/chats", { userId });
+
+        // Returning the response data
+        return data;
+    },
 };

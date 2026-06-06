@@ -188,19 +188,6 @@
     padding: 4px 0 8px;
 }
 
-.chatRow {
-    transition: background-color 0.15s ease;
-    border-radius: 0;
-}
-
-.chatRowActive {
-    background-color: #121212;
-}
-
-.chatRowActive:hover {
-    background-color: #181818;
-}
-
 .statusMsg {
     color: #8e8e8e;
     font-size: 13px;

@@ -13,23 +13,17 @@ import { RiEditBoxLine, RiSearchLine, RiAddLine } from "react-icons/ri";
 // Importing chat slice action
 import { fetchChats } from "../../state/chatSlice";
 
-// Importing the toast hook
-import { useToast } from "../../../../shared/ui/jsx/Toast";
-
 // Importing sibling components
 import EmptyChats from "./EmptyChats";
 import ChatListItem from "./ChatListItem";
 
+// Importing the "Make some friends" modal
+import MakeFriendsModal from "./MakeFriendsModal";
+
 // Importing CSS module for the chats screen
 import styles from "../css/ChatsScreen.module.css";
 
-// Static filter tabs displayed under the search bar (visual only for now)
-const FILTERS = [
-    { id: "all", label: "All" },
-    { id: "unread", label: "Unread" },
-    { id: "favourites", label: "Favourites" },
-    { id: "groups", label: "Groups" },
-];
+
 
 // The Chats tab screen: header, notes, search, filter tabs, list or empty state
 function ChatsScreen() {
@@ -37,8 +31,9 @@ function ChatsScreen() {
     // Local state for search input
     const [search, setSearch] = useState("");
 
-    // Local state for the currently selected filter tab
-    const [filter, setFilter] = useState("all");
+    // Local state for the "Make some friends" modal
+    const [friendsModalOpen, setFriendsModalOpen] = useState(false);
+    const [friendsModalKey, setFriendsModalKey] = useState(0);
 
     // Getting dispatch and chat state from redux
     const dispatch = useDispatch();
@@ -46,9 +41,6 @@ function ChatsScreen() {
 
     // Getting current user for the "Your note" bubble
     const { user } = useSelector((state) => state.auth);
-
-    // Getting the toast hook
-    const toast = useToast();
 
     // Effect to fetch chats on mount (only if not yet loaded)
     useEffect(() => {
@@ -64,10 +56,14 @@ function ChatsScreen() {
         return chat.participants?.some((p) => p?.name?.toLowerCase().includes(q));
     });
 
-    // Handler for the "Make some friends" CTA in the empty state
+    // Handler for the "Make some friends" CTA in the empty state - opens the discovery modal
     const handleMakeFriends = () => {
-        toast.info("Coming soon", "Friend discovery is on the way");
+        setFriendsModalKey((k) => k + 1);
+        setFriendsModalOpen(true);
     };
+
+    // Closing the discovery modal (no chat is auto-selected on mobile - the list will refresh instead)
+    const closeFriendsModal = () => setFriendsModalOpen(false);
 
     // Computing first letter of the user's name for the avatar placeholder
     const initial = (user?.name || "?").trim().charAt(0).toUpperCase();
@@ -138,25 +134,15 @@ function ChatsScreen() {
                 </button>
             </div>
 
-            {/* Filter tabs */}
-            <div className={styles.filters}>
-                {FILTERS.map((f) => (
-                    <button
-                        key={f.id}
-                        type="button"
-                        className={`${styles.filterTab} ${filter === f.id ? styles.filterTabActive : ""}`}
-                        onClick={() => setFilter(f.id)}
-                    >
-                        {f.label}
-                    </button>
-                ))}
-                <button type="button" className={styles.filterAdd} aria-label="Add filter">
-                    <RiAddLine />
-                </button>
-            </div>
-
             {/* Body */}
             <div className={styles.body}>{body}</div>
+
+            {/* "Make some friends" discovery modal */}
+            <MakeFriendsModal
+                key={`friends-${friendsModalKey}`}
+                open={friendsModalOpen}
+                onClose={closeFriendsModal}
+            />
         </div>
     );
 }

@@ -23,4 +23,14 @@ export const userApi = {
         // Returning the response data
         return data;
     },
+
+    // Function to fetch a random sample of verified users (excluding the requester) for the "Make some friends" flow
+    getRandomUsers: async (limit = 20) => {
+
+        // Sending get request to backend with an optional limit
+        const { data } = await api.get("/users/random", { params: { limit } });
+
+        // Returning the response data
+        return data;
+    },
 };

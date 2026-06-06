@@ -12,12 +12,12 @@ import { RiArrowDownSLine, RiEditBoxLine, RiSearchLine, RiLockPasswordLine, RiUs
 // Importing chat slice action
 import { fetchChats } from "../../state/chatSlice";
 
-// Importing the toast hook
-import { useToast } from "../../../../shared/ui/jsx/Toast";
-
 // Importing the change-password / change-profile-pic modals
 import ChangePasswordModal from "../../../user/ui/jsx/ChangePasswordModal";
 import ChangeProfilePicModal from "../../../user/ui/jsx/ChangeProfilePicModal";
+
+// Importing the "Make some friends" modal
+import MakeFriendsModal from "./MakeFriendsModal";
 
 // Importing sibling components
 import EmptyChats from "./EmptyChats";
@@ -30,6 +30,7 @@ import styles from "../css/DesktopChatList.module.css";
 const NO_MODAL = null;
 const PASSWORD_MODAL = "password";
 const PFP_MODAL = "profilePic";
+const FRIENDS_MODAL = "friends";
 
 // Chat list column for the desktop layout (username header + search + list)
 function DesktopChatList({ selectedChatId, onSelectChat }) {
@@ -54,9 +55,6 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
 
     // Getting current user for the username header
     const { user } = useSelector((state) => state.auth);
-
-    // Getting the toast hook
-    const toast = useToast();
 
     // Effect: fetch chats on mount (only if not yet loaded)
     useEffect(() => {
@@ -90,9 +88,15 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
         return chat.participants?.some((p) => p?.name?.toLowerCase().includes(q));
     });
 
-    // Handler for the "Make some friends" CTA in the empty state
+    // Handler for the "Make some friends" CTA in the empty state - opens the discovery modal
     const handleMakeFriends = () => {
-        toast.info("Coming soon", "Friend discovery is on the way");
+        setModalKey((k) => k + 1);
+        setActiveModal(FRIENDS_MODAL);
+    };
+
+    // When a chat is created via the discovery modal, select it so the right panel opens it
+    const handleChatCreated = (chat) => {
+        if (chat) onSelectChat?.(chat);
     };
 
     // Menu item handlers (close dropdown, open the matching modal)
@@ -130,13 +134,13 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
         body = (
             <ul className={styles.chatList}>
                 {filteredChats.map((chat) => (
-                    <li
+                    <ChatListItem
                         key={chat._id}
-                        className={`${styles.chatRow} ${selectedChatId === chat._id ? styles.chatRowActive : ""}`}
+                        chat={chat}
+                        currentUserId={user?.id}
+                        isSelected={selectedChatId === chat._id}
                         onClick={() => onSelectChat?.(chat)}
-                    >
-                        <ChatListItem chat={chat} currentUserId={user?.id} />
-                    </li>
+                    />
                 ))}
             </ul>
         );
@@ -219,6 +223,7 @@ function DesktopChatList({ selectedChatId, onSelectChat }) {
             {/* Account-action modals (key bumps on every open so internal state resets) */}
             <ChangePasswordModal key={`pwd-${modalKey}`} open={activeModal === PASSWORD_MODAL} onClose={closeModal} />
             <ChangeProfilePicModal key={`pfp-${modalKey}`} open={activeModal === PFP_MODAL} onClose={closeModal} />
+            <MakeFriendsModal key={`friends-${modalKey}`} open={activeModal === FRIENDS_MODAL} onClose={closeModal} onChatCreated={handleChatCreated} />
         </section>
     );
 }

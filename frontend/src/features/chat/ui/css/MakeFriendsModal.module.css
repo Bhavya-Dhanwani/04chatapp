@@ -1,0 +1,104 @@
+/* Container for the modal body - keeps the user list in a scrollable area */
+.container {
+    width: 100%;
+    padding: 4px 0 8px;
+}
+
+/* Vertical, scrollable list of users. Height is capped so the list scrolls on overflow */
+.userList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 60vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    scrollbar-width: thin;
+    scrollbar-color: #363636 transparent;
+}
+
+.userList::-webkit-scrollbar {
+    width: 6px;
+}
+
+.userList::-webkit-scrollbar-thumb {
+    background-color: #363636;
+    border-radius: 3px;
+}
+
+/* Each row is a tappable card: circular PFP on top, name centered below */
+.userBtn {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 12px;
+    background-color: #121212;
+    border: 1px solid #262626;
+    border-radius: 12px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+}
+
+.userBtn:hover:not(:disabled) {
+    background-color: #1a1a1a;
+    border-color: #363636;
+}
+
+.userBtn:active:not(:disabled) {
+    transform: scale(0.99);
+}
+
+.userBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* The circular profile picture */
+.avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.avatarInitial {
+    color: #d9d9d9;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.name {
+    color: #fff;
+    font-size: 14px;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Loading / error / empty state message */
+.statusMsg {
+    color: #8e8e8e;
+    font-size: 14px;
+    text-align: center;
+    padding: 24px 0;
+    margin: 0;
+}

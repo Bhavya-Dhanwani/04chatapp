@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import userModel from "../models/user.model.js";
 import ApiError from "../utils/ApiError.util.js";
 import { changePasswordValidator, changeProfilePicValidator } from "../validators/user.validate.js";
@@ -58,4 +59,26 @@ async function changeProfilePicService(userId, profilePic, profilePicId) {
     return user;
 }
 
-export { changePasswordService, changeProfilePicService };
+// Service to fetch a random sample of verified users (used by "Make some friends" suggestion list)
+async function getRandomUsersService(userId, limit) {
+
+    // Bound the limit so a client cannot request an arbitrarily large payload
+    const safeLimit = Math.min(Math.max(Number(limit) || 20, 1), 50);
+
+    // Aggregating a random sample of verified users, excluding the requester
+    const users = await userModel.aggregate([
+        { $match: { _id: { $ne: new mongoose.Types.ObjectId(userId) }, isVerified: true } },
+        { $sample: { size: safeLimit } },
+        {
+            $project: {
+                _id: 1,
+                name: 1,
+                profilePic: 1
+            }
+        }
+    ]);
+
+    return users;
+}
+
+export { changePasswordService, changeProfilePicService, getRandomUsersService };

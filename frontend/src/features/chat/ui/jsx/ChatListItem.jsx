@@ -23,7 +23,7 @@ function formatTime(timestamp) {
 }
 
 // Component representing a single conversation row in the chat list
-function ChatListItem({ chat, currentUserId }) {
+function ChatListItem({ chat, currentUserId, isSelected, onClick }) {
 
     // Finding the "other" participant for one-on-one chats (fallback to first participant)
     const otherParticipant = chat.participants?.find((p) => p?._id !== currentUserId) || chat.participants?.[0];
@@ -39,7 +39,10 @@ function ChatListItem({ chat, currentUserId }) {
     const timestamp = formatTime(chat.lastMessage?.createdAt || chat.updatedAt);
 
     return (
-        <li className={styles.item}>
+        <li
+            className={`${styles.item} ${isSelected ? styles.itemActive : ""}`}
+            onClick={onClick}
+        >
             <div className={styles.avatar}>
                 {otherParticipant?.profilePic ? (
                     // eslint-disable-next-line @next/next/no-img-element

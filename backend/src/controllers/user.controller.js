@@ -1,5 +1,5 @@
 // Importing modules
-import { changePasswordService, changeProfilePicService } from "../services/user.service.js";
+import { changePasswordService, changeProfilePicService, getRandomUsersService } from "../services/user.service.js";
 import Apiresponse from "../utils/ApiResponse.util.js";
 import { sanitizeUser } from "../utils/sanitize.util.js";
 
@@ -29,4 +29,16 @@ async function changeProfilePicController(req, res) {
     return Apiresponse(res, 200, "Profile picture updated successfully", sanitizeUser(updatedUser));
 }
 
-export { changePasswordController, changeProfilePicController };
+// Controller: GET /api/users/random  - return a random sample of verified users (excluding the requester)
+async function getRandomUsersController(req, res) {
+
+    // Reading the optional limit from the query string
+    const { limit } = req.query;
+
+    // Fetching the sample via the service
+    const users = await getRandomUsersService(req.user.id, limit);
+
+    return Apiresponse(res, 200, "Random users fetched successfully", users);
+}
+
+export { changePasswordController, changeProfilePicController, getRandomUsersController };

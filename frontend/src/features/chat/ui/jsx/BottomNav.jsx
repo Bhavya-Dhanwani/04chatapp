@@ -1,55 +1,85 @@
 "use client";
 
+// Importing hooks from react
+import { useState } from "react";
+
+// Importing hooks from react-redux
+import { useSelector } from "react-redux";
+
 // Importing icons from react-icons
-import {
-    RiChat3Line,
-    RiChat3Fill,
-    RiRecordCircleLine,
-    RiRecordCircleFill,
-    RiPhoneLine,
-    RiPhoneFill,
-    RiGroupLine,
-    RiGroupFill,
-    RiSettings3Line,
-    RiSettings3Fill,
-} from "react-icons/ri";
+import { RiUserLine, RiAddLine } from "react-icons/ri";
+
+// Importing the change-profile-pic modal (opened by the "+" update button)
+import ChangeProfilePicModal from "../../../user/ui/jsx/ChangeProfilePicModal";
 
 // Importing CSS module for bottom nav styling
 import styles from "../css/BottomNav.module.css";
 
-// Definition of the bottom nav tabs (id, label, inactive icon, active icon)
-const TABS = [
-    { id: "chats", label: "Chats", Icon: RiChat3Line, IconActive: RiChat3Fill },
-    { id: "status", label: "Status", Icon: RiRecordCircleLine, IconActive: RiRecordCircleFill },
-    { id: "calls", label: "Calls", Icon: RiPhoneLine, IconActive: RiPhoneFill },
-    { id: "communities", label: "Communities", Icon: RiGroupLine, IconActive: RiGroupFill },
-    { id: "settings", label: "Settings", Icon: RiSettings3Line, IconActive: RiSettings3Fill },
-];
+// Bottom navigation component for the mobile chat shell.
+// Shows only the current user's profile picture, name, and a "+" button
+// to open the change-profile-pic modal (the "updation thing").
+function BottomNav() {
 
-// Bottom navigation component for the mobile chat shell
-function BottomNav({ activeTab, onTabChange }) {
+    // Local state to control the change-profile-pic modal
+    const [pfpModalOpen, setPfpModalOpen] = useState(false);
+    const [pfpModalKey, setPfpModalKey] = useState(0);
 
-    // Rendering the nav bar with one button per tab
+    // Getting the current user from the auth slice
+    const { user } = useSelector((state) => state.auth);
+
+    // First letter of the user's name for the avatar fallback
+    const initial = (user?.name || "?").trim().charAt(0).toUpperCase();
+
+    // Display name (fallback to "You" if missing)
+    const displayName = user?.name || "You";
+
+    // Opening the profile-pic update modal (key bump resets the modal's form state)
+    const openUpdateModal = () => {
+        setPfpModalKey((k) => k + 1);
+        setPfpModalOpen(true);
+    };
+
+    const closeUpdateModal = () => setPfpModalOpen(false);
+
     return (
-        <nav className={styles.nav}>
-            {TABS.map((tab) => {
-                const isActive = tab.id === activeTab;
-                const Icon = isActive ? tab.IconActive : tab.Icon;
-                return (
+        <>
+            <nav className={styles.nav} aria-label="Your profile">
+                <div className={styles.profile}>
                     <button
-                        key={tab.id}
                         type="button"
-                        className={`${styles.tab} ${isActive ? styles.tabActive : ""}`}
-                        onClick={() => onTabChange(tab.id)}
-                        aria-label={tab.label}
-                        aria-current={isActive ? "page" : undefined}
+                        className={styles.avatarBtn}
+                        onClick={openUpdateModal}
+                        aria-label="Update your profile picture"
                     >
-                        <Icon className={styles.tabIcon} />
-                        <span className={styles.tabLabel}>{tab.label}</span>
+                        {user?.profilePic ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={user.profilePic} alt="" className={styles.avatarImg} />
+                        ) : user?.name ? (
+                            <span className={styles.avatarInitial}>{initial}</span>
+                        ) : (
+                            <RiUserLine className={styles.avatarPlaceholder} />
+                        )}
                     </button>
-                );
-            })}
-        </nav>
+
+                    <span className={styles.name} title={displayName}>{displayName}</span>
+                </div>
+
+                <button
+                    type="button"
+                    className={styles.updateBtn}
+                    onClick={openUpdateModal}
+                    aria-label="Update profile"
+                >
+                    <RiAddLine />
+                </button>
+            </nav>
+
+            <ChangeProfilePicModal
+                key={`bottomnav-pfp-${pfpModalKey}`}
+                open={pfpModalOpen}
+                onClose={closeUpdateModal}
+            />
+        </>
     );
 }
 
