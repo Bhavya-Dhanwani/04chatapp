@@ -1,7 +1,7 @@
 import ApiError from "../utils/ApiError.util.js";
 
 // Function to validate the signup data
-function signupValidator(name, email, password, profilePic) {
+function signupValidator(name, email, password, profilePic, profilePicId) {
 
     // Applying the validations
     if (!name) throw new ApiError(400, "Name is required");
@@ -21,6 +21,11 @@ function signupValidator(name, email, password, profilePic) {
         if (typeof profilePic !== "string") throw new ApiError(400, "Profile picture must be a valid URL");
         const urlRegex = /^https?:\/\/[^\s]+$/;
         if (!urlRegex.test(profilePic)) throw new ApiError(400, "Profile picture must be a valid URL");
+    }
+
+    // profilePicId is optional; if provided, must be a non-empty string
+    if (profilePicId !== undefined && profilePicId !== null && profilePicId !== "") {
+        if (typeof profilePicId !== "string") throw new ApiError(400, "Profile picture id must be a string");
     }
 }
 

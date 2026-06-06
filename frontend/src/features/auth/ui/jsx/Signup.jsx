@@ -65,10 +65,13 @@ function Signup() {
         dispatch(clearError());
 
         let profilePicUrl;
+        let profilePicId;
         if (profileFile) {
             try {
                 setUploading(true);
-                profilePicUrl = await imagekitApi.uploadProfilePic(profileFile);
+                const uploaded = await imagekitApi.uploadProfilePic(profileFile);
+                profilePicUrl = uploaded.url;
+                profilePicId = uploaded.fileId;
             } catch (err) {
                 console.log("Profile pic upload error:", err);
                 toast.error("Upload failed", err.message || "Could not upload profile picture");
@@ -78,7 +81,7 @@ function Signup() {
             setUploading(false);
         }
 
-        const result = await dispatch(signup({ name, email, password, profilePic: profilePicUrl }));
+        const result = await dispatch(signup({ name, email, password, profilePic: profilePicUrl, profilePicId }));
         if (signup.fulfilled.match(result)) {
             toast.success("Account created", "Please verify your email");
             router.push("/verify");

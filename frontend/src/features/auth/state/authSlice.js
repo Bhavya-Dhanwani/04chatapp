@@ -4,6 +4,9 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // Importing auth API functions
 import { authApi } from "../api/authApi";
 
+// Importing user API functions
+import { userApi } from "../../user/api/userApi";
+
 // Importing token management utilities
 import { setAccessToken, clearAccessToken } from "../../../app/tokenStore";
 
@@ -27,11 +30,11 @@ export const login = createAsyncThunk("auth/login", async ({ email, password }, 
 });
 
 // Async thunk for user signup
-export const signup = createAsyncThunk("auth/signup", async ({ name, email, password, profilePic }, { rejectWithValue }) => {
+export const signup = createAsyncThunk("auth/signup", async ({ name, email, password, profilePic, profilePicId }, { rejectWithValue }) => {
     try {
 
         // Calling signup API
-        const data = await authApi.signup(name, email, password, profilePic);
+        const data = await authApi.signup(name, email, password, profilePic, profilePicId);
 
         // Returning the response data
         return data;
@@ -115,6 +118,44 @@ export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ tok
 
         // Logging error for debugging
         console.log("Reset password error:", err);
+
+        // Returning error message on failure
+        return rejectWithValue(err.response?.data?.message || err.message);
+    }
+});
+
+// Async thunk for changing the logged-in user's password
+export const changePassword = createAsyncThunk("auth/changePassword", async ({ currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+
+        // Calling change password API
+        const data = await userApi.changePassword(currentPassword, newPassword);
+
+        // Returning the response data
+        return data;
+    } catch (err) {
+
+        // Logging error for debugging
+        console.log("Change password error:", err);
+
+        // Returning error message on failure
+        return rejectWithValue(err.response?.data?.message || err.message);
+    }
+});
+
+// Async thunk for changing the logged-in user's profile picture URL
+export const changeProfilePic = createAsyncThunk("auth/changeProfilePic", async ({ profilePic, profilePicId }, { rejectWithValue }) => {
+    try {
+
+        // Calling change profile picture API
+        const data = await userApi.changeProfilePic(profilePic, profilePicId);
+
+        // Returning the response data
+        return data;
+    } catch (err) {
+
+        // Logging error for debugging
+        console.log("Change profile pic error:", err);
 
         // Returning error message on failure
         return rejectWithValue(err.response?.data?.message || err.message);
@@ -275,6 +316,50 @@ const authSlice = createSlice({
 
             // Reset password rejected state
             .addCase(resetPassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Change password pending state
+            .addCase(changePassword.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+
+            // Change password fulfilled state
+            .addCase(changePassword.fulfilled, (state, action) => {
+                state.loading = false;
+
+                // Updating the user with the fresh data from the server
+                if (action.payload?.data) {
+                    state.user = action.payload.data;
+                }
+            })
+
+            // Change password rejected state
+            .addCase(changePassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            // Change profile pic pending state
+            .addCase(changeProfilePic.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+
+            // Change profile pic fulfilled state
+            .addCase(changeProfilePic.fulfilled, (state, action) => {
+                state.loading = false;
+
+                // Updating the user with the fresh data from the server
+                if (action.payload?.data) {
+                    state.user = action.payload.data;
+                }
+            })
+
+            // Change profile pic rejected state
+            .addCase(changeProfilePic.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

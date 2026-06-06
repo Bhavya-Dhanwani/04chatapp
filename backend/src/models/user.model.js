@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             trim: true,
             default: ""
+        },
+        profilePicId: {
+            type: String,
+            trim: true,
+            default: ""
         }
     },
     {

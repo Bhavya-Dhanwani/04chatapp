@@ -49,8 +49,8 @@ export const imagekitApi = {
             throw new Error(json?.message || "ImageKit upload failed");
         }
 
-        // Returning the hosted file URL
-        return json.url;
+        // Returning both the hosted URL and the ImageKit fileId (needed to delete the file later)
+        return { url: json.url, fileId: json.fileId };
     },
 
     // Function to run the full signup profile picture flow (presign + upload)
@@ -64,7 +64,7 @@ export const imagekitApi = {
         // Step 1: get presigned auth params from our backend
         const authParams = await imagekitApi.getSignupUploadAuth();
 
-        // Step 2: upload the file directly to ImageKit and return the hosted URL
+        // Step 2: upload the file directly to ImageKit and return the { url, fileId }
         return await imagekitApi.uploadToImageKit(file, authParams);
     },
 };

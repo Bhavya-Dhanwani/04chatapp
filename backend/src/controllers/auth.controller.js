@@ -14,10 +14,10 @@ import imagekit from "../config/imagekit.config.js";
 async function signupController(req, res) {
 
     // accepting the data
-    let { name, email, password, profilePic } = req.body;
+    let { name, email, password, profilePic, profilePicId } = req.body;
 
     // Using the signup service to valdiate and create the user
-    const newuser = await signupService(name, email, password, profilePic);
+    const newuser = await signupService(name, email, password, profilePic, profilePicId);
 
     // using sessions service to create session
     const { refreshToken, session } = await createSessionService(newuser._id);
