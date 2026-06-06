@@ -177,3 +177,91 @@
     text-align: left;
     margin-top: 4px;
 }
+
+.avatarSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.avatarPicker {
+    position: relative;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    background-color: #121212;
+    border: 1px solid #262626;
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s;
+}
+
+.avatarPicker:hover {
+    border-color: #525252;
+}
+
+.avatarPicker:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.avatarImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.avatarPlaceholder {
+    width: 36px;
+    height: 36px;
+    color: #737373;
+}
+
+.avatarOverlay {
+    position: absolute;
+    right: 2px;
+    bottom: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: #0095f6;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    border: 2px solid #000;
+}
+
+.avatarHint {
+    color: #8e8e8e;
+    font-size: 12px;
+}
+
+.avatarRemove {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: #ed4956;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.avatarRemove:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.hiddenFileInput {
+    display: none;
+}

@@ -1,0 +1,121 @@
+.panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #000;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px 24px;
+    gap: 10px;
+}
+
+.iconWrap {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.icon {
+    font-size: 44px;
+}
+
+.title {
+    color: #fff;
+    font-size: 22px;
+    font-weight: 400;
+    margin: 0;
+}
+
+.subtitle {
+    color: #8e8e8e;
+    font-size: 14px;
+    margin: 0 0 12px;
+}
+
+.panelHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid #1a1a1a;
+    flex-shrink: 0;
+}
+
+.peerAvatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    border: 1px solid #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.peerAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.peerInitial {
+    font-size: 14px;
+    font-weight: 600;
+    color: #d9d9d9;
+}
+
+.peerMeta {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.peerName {
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.peerStatus {
+    color: #8e8e8e;
+    font-size: 11px;
+}
+
+.placeholder {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #525252;
+}
+
+.placeholderIcon {
+    font-size: 48px;
+}
+
+.placeholderText {
+    color: #525252;
+    font-size: 13px;
+    margin: 0;
+}

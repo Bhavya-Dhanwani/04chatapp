@@ -1,0 +1,47 @@
+.nav {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-around;
+    height: 64px;
+    background-color: #000;
+    border-top: 1px solid #1a1a1a;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+.tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #8e8e8e;
+    cursor: pointer;
+    padding: 8px 4px;
+    transition: color 0.15s ease;
+}
+
+.tab:hover {
+    color: #d9d9d9;
+}
+
+.tabActive {
+    color: #0095f6;
+}
+
+.tabActive:hover {
+    color: #0095f6;
+}
+
+.tabIcon {
+    font-size: 22px;
+}
+
+.tabLabel {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+}

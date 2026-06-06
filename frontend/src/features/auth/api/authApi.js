@@ -14,11 +14,11 @@ export const authApi = {
         return data;
     },
 
-    // Function to register new user with name, email and password
-    signup: async (name, email, password) => {
+    // Function to register new user with name, email, password and optional profile picture URL
+    signup: async (name, email, password, profilePic) => {
 
         // Sending signup request to backend
-        const { data } = await api.post("/auth/signup", { name, email, password });
+        const { data } = await api.post("/auth/signup", { name, email, password, profilePic });
 
         // Returning the response data
         return data;

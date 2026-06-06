@@ -15,3 +15,4 @@ export const SMTP_USER = process.env.SMTP_USER || "";
 export const SMTP_PASS = process.env.SMTP_PASS || "";
 export const TRANSACTION_MAIL = process.env.TRANSACTIONAL_EMAIL || "";
 export const FRONTEND_URL = process.env.FRONTEND_URL || "";
+export const IMAGEKIT_PRIVATE_KEY = process.env.IMAGEKIT_PRIVATE_KEY || "";

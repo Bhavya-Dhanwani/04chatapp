@@ -1,0 +1,239 @@
+.screen {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 8px;
+    flex-shrink: 0;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    letter-spacing: -0.4px;
+}
+
+.headerActions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.iconBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.15s ease;
+}
+
+.iconBtn:hover {
+    background-color: #1a1a1a;
+}
+
+.searchWrap {
+    position: relative;
+    padding: 4px 16px 12px;
+    flex-shrink: 0;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 28px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8e8e8e;
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    background-color: #1a1a1a;
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 13px;
+    outline: none;
+}
+
+.searchInput::placeholder {
+    color: #8e8e8e;
+}
+
+.notesStrip {
+    display: flex;
+    gap: 12px;
+    padding: 0 16px 12px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+
+.notesStrip::-webkit-scrollbar {
+    display: none;
+}
+
+.noteItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    flex-shrink: 0;
+    padding: 0;
+}
+
+.noteAvatar {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    border: 1px solid #262626;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.noteAvatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.noteAvatarInitial {
+    font-size: 18px;
+    font-weight: 600;
+    color: #8e8e8e;
+}
+
+.noteAdd {
+    position: absolute;
+    right: -2px;
+    bottom: -2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #0095f6;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #000;
+    font-size: 12px;
+    overflow: visible;
+}
+
+.noteLabel {
+    font-size: 11px;
+    color: #d9d9d9;
+    max-width: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px 12px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+
+.filters::-webkit-scrollbar {
+    display: none;
+}
+
+.filterTab {
+    padding: 6px 14px;
+    background-color: #1a1a1a;
+    border: 1px solid #262626;
+    border-radius: 999px;
+    color: #d9d9d9;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.filterTab:hover {
+    background-color: #262626;
+}
+
+.filterTabActive {
+    background-color: #0095f6;
+    border-color: #0095f6;
+    color: #fff;
+}
+
+.filterTabActive:hover {
+    background-color: #0095f6;
+}
+
+.filterAdd {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #1a1a1a;
+    border: 1px solid #262626;
+    color: #d9d9d9;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 14px;
+}
+
+.filterAdd:hover {
+    background-color: #262626;
+}
+
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.chatList {
+    list-style: none;
+    margin: 0;
+    padding: 4px 0 8px;
+}
+
+.statusMsg {
+    color: #8e8e8e;
+    font-size: 13px;
+    text-align: center;
+    padding: 24px 16px;
+    margin: 0;
+}

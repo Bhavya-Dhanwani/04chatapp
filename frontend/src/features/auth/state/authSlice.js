@@ -27,11 +27,11 @@ export const login = createAsyncThunk("auth/login", async ({ email, password }, 
 });
 
 // Async thunk for user signup
-export const signup = createAsyncThunk("auth/signup", async ({ name, email, password }, { rejectWithValue }) => {
+export const signup = createAsyncThunk("auth/signup", async ({ name, email, password, profilePic }, { rejectWithValue }) => {
     try {
 
         // Calling signup API
-        const data = await authApi.signup(name, email, password);
+        const data = await authApi.signup(name, email, password, profilePic);
 
         // Returning the response data
         return data;

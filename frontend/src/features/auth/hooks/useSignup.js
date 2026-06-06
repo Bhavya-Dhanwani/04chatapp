@@ -14,10 +14,10 @@ export function useSignup() {
     const { loading, error } = useSelector((state) => state.auth);
 
     // Function to signup user
-    const signup = async (name, email, password) => {
+    const signup = async (name, email, password, profilePic) => {
 
         // Dispatching signup action
-        const result = await dispatch(signupAction({ name, email, password }));
+        const result = await dispatch(signupAction({ name, email, password, profilePic }));
 
         // Returning the result
         return result;

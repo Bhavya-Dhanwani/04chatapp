@@ -8,15 +8,16 @@ import { sanitizeUser } from "../utils/sanitize.util.js";
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util.js";
 import sendMail from "../utils/sendMail.util.js";
 import { FRONTEND_URL } from "../config/env.config.js";
+import imagekit from "../config/imagekit.config.js";
 
 // Function to make the signup functionality
 async function signupController(req, res) {
 
     // accepting the data
-    let { name, email, password } = req.body;
+    let { name, email, password, profilePic } = req.body;
 
     // Using the signup service to valdiate and create the user
-    const newuser = await signupService(name, email, password);
+    const newuser = await signupService(name, email, password, profilePic);
 
     // using sessions service to create session
     const { refreshToken, session } = await createSessionService(newuser._id);
@@ -205,6 +206,16 @@ async function meController(req, res) {
     return Apiresponse(res, 200, "User fetched successfully", sanitizeUser(req.user));
 }
 
+// Function to issue ImageKit presigned upload params for the profile picture during signup
+async function signupUploadAuthController(req, res) {
+
+    // generating the auth params (token, expire, signature) using only the private key
+    const authParams = imagekit.helper.getAuthenticationParameters();
+
+    // returning the params for the client to upload directly to ImageKit
+    return Apiresponse(res, 200, "Upload auth generated successfully", authParams);
+}
+
 export {
     signupController,
     loginController,
@@ -215,5 +226,6 @@ export {
     forgotPasswordController,
     resetPasswordController,
     meController,
-    refreshController
+    refreshController,
+    signupUploadAuthController
 };

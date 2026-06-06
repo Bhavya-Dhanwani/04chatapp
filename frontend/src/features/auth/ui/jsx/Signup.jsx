@@ -1,31 +1,84 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { signup, clearError } from "../../state/authSlice";
+import { imagekitApi } from "../../api/imagekitApi";
 import { useToast } from "../../../../shared/ui/jsx/Toast";
 import styles from "../css/Signup.module.css";
 import Image from "next/image";
 import Link from "next/link";
 import { HiOutlineMail } from "react-icons/hi";
-import { RiLockLine, RiEyeLine, RiEyeOffLine, RiUserLine } from "react-icons/ri";
+import { RiLockLine, RiEyeLine, RiEyeOffLine, RiUserLine, RiCameraLine, RiCloseLine } from "react-icons/ri";
+
+const MAX_PROFILE_PIC_BYTES = 5 * 1024 * 1024;
 
 function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [profileFile, setProfileFile] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef(null);
     const router = useRouter();
     const dispatch = useDispatch();
     const { loading, error } = useSelector((state) => state.auth);
     const toast = useToast();
 
+    const profilePreview = useMemo(
+        () => (profileFile ? URL.createObjectURL(profileFile) : ""),
+        [profileFile]
+    );
+
+    useEffect(() => {
+        if (!profilePreview) return;
+        return () => URL.revokeObjectURL(profilePreview);
+    }, [profilePreview]);
+
+    const handlePickFile = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e) => {
+        const file = e.target.files?.[0];
+        e.target.value = "";
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            toast.error("Invalid file", "Please choose an image file");
+            return;
+        }
+        if (file.size > MAX_PROFILE_PIC_BYTES) {
+            toast.error("File too large", "Profile picture must be under 5 MB");
+            return;
+        }
+        setProfileFile(file);
+    };
+
+    const handleRemoveFile = () => {
+        setProfileFile(null);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         dispatch(clearError());
 
-        const result = await dispatch(signup({ name, email, password }));
+        let profilePicUrl;
+        if (profileFile) {
+            try {
+                setUploading(true);
+                profilePicUrl = await imagekitApi.uploadProfilePic(profileFile);
+            } catch (err) {
+                console.log("Profile pic upload error:", err);
+                toast.error("Upload failed", err.message || "Could not upload profile picture");
+                setUploading(false);
+                return;
+            }
+            setUploading(false);
+        }
+
+        const result = await dispatch(signup({ name, email, password, profilePic: profilePicUrl }));
         if (signup.fulfilled.match(result)) {
             toast.success("Account created", "Please verify your email");
             router.push("/verify");
@@ -33,6 +86,8 @@ function Signup() {
             toast.error("Signup failed", result.payload);
         }
     };
+
+    const submitDisabled = loading || uploading;
 
     return (
         <div className={styles.authContainer}>
@@ -49,6 +104,49 @@ function Signup() {
                 <p className={styles.subtitle}>Join meelmilap and start your journey</p>
 
                 <form onSubmit={handleSubmit}>
+                    <div className={styles.avatarSection}>
+                        <button
+                            type="button"
+                            className={styles.avatarPicker}
+                            onClick={handlePickFile}
+                            disabled={uploading}
+                            aria-label="Choose profile picture"
+                        >
+                            {profilePreview ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                    src={profilePreview}
+                                    alt="Profile preview"
+                                    className={styles.avatarImage}
+                                />
+                            ) : (
+                                <RiUserLine className={styles.avatarPlaceholder} />
+                            )}
+                            <span className={styles.avatarOverlay}>
+                                <RiCameraLine />
+                            </span>
+                        </button>
+                        {profileFile ? (
+                            <button
+                                type="button"
+                                className={styles.avatarRemove}
+                                onClick={handleRemoveFile}
+                                disabled={uploading}
+                            >
+                                <RiCloseLine /> Remove
+                            </button>
+                        ) : (
+                            <span className={styles.avatarHint}>Add profile picture (optional)</span>
+                        )}
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            accept="image/*"
+                            className={styles.hiddenFileInput}
+                            onChange={handleFileChange}
+                        />
+                    </div>
+
                     <div className={styles.inputGroup}>
                         <span className={styles.inputIcon}>
                             <RiUserLine />
@@ -97,9 +195,9 @@ function Signup() {
                     <button
                         className={styles.submitBtn}
                         type="submit"
-                        disabled={loading}
+                        disabled={submitDisabled}
                     >
-                        {loading ? "Signing up..." : "Sign Up"}
+                        {uploading ? "Uploading picture..." : loading ? "Signing up..." : "Sign Up"}
                     </button>
                 </form>
 
@@ -122,3 +220,4 @@ function Signup() {
 }
 
 export default Signup;
+

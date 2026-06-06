@@ -2,7 +2,7 @@
 function sanitizeUser(user, accesstoken) {
 
     // Extracting the user data safely
-    const { name, email } = user;
+    const { name, email, profilePic } = user;
 
     // Getting the user id - handles both _id (from MongoDB) and id (from JWT)
     const userId = user._id || user.id;
@@ -13,6 +13,7 @@ function sanitizeUser(user, accesstoken) {
         email,
         id: userId,
         isVerified: user.isVerified,
+        profilePic: profilePic || "",
         accesstoken: accesstoken || null
     }
 }

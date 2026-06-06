@@ -3,13 +3,17 @@ import ApiError from "../utils/ApiError.util.js";
 import { loginValidator, signupValidator } from "../validators/auth.validate.js";
 
 // signup service to create users
-async function signupService(name, email, password) {
+async function signupService(name, email, password, profilePic) {
 
     // Validating the data
-    signupValidator(name, email, password);
+    signupValidator(name, email, password, profilePic);
+
+    // building the user payload (profilePic is optional)
+    const payload = { name, email, password };
+    if (profilePic) payload.profilePic = profilePic;
 
     // added the user in the database
-    const newuser = await userModel.create({ name, email, password });
+    const newuser = await userModel.create(payload);
 
     return newuser;
 }

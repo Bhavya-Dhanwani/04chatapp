@@ -1,0 +1,64 @@
+.viewport {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #050505;
+    align-items: center;
+    justify-content: stretch;
+}
+
+.shell {
+    width: 100%;
+    max-width: 480px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #000;
+    border-left: 1px solid #1a1a1a;
+    border-right: 1px solid #1a1a1a;
+    overflow: hidden;
+}
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.stub {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.stubTitle {
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.stubSubtitle {
+    color: #8e8e8e;
+    font-size: 13px;
+    margin: 0;
+}
+
+@media (max-width: 520px) {
+    .viewport {
+        background-color: #000;
+    }
+
+    .shell {
+        max-width: 100%;
+        border-left: none;
+        border-right: none;
+    }
+}
