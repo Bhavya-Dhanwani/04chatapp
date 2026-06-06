@@ -6,7 +6,7 @@ import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
 
 // Creating axios instance with default configuration
 const api = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: "https://zero4chatapp.onrender.com/api",
     headers: {
         "Content-Type": "application/json",
     },
