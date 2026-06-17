@@ -39,12 +39,21 @@ async function sendMessageService(chatId, senderId, content) {
         .findById(message._id)
         .populate("senderId", "name profilePic");
 
-    // Emitting the message to all participants via Socket.IO (real-time delivery)
+    const populatedChat = await chatModel
+        .findById(chat._id)
+        .populate("participants", "name email profilePic isVerified")
+        .populate("lastMessage");
+
+    // Emitting to the chat room plus each participant's personal room.
+    // A recipient may not have joined a brand-new direct chat room yet, so
+    // personal rooms ensure the first message creates the chat row for them.
     const io = getIO();
     if (io) {
-        io.to(chatId).emit("receive_message", {
+        const rooms = [String(chatId), ...chat.participants.map((p) => String(p))];
+        io.to(rooms).emit("receive_message", {
             chatId,
-            message: populated
+            message: populated,
+            chat: populatedChat
         });
     }
 

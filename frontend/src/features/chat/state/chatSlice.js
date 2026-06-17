@@ -4,6 +4,49 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 // Importing chat API functions
 import { chatApi } from "../api/chatApi";
 
+function getSenderId(message) {
+    return message?.senderId?._id || message?.senderId || "";
+}
+
+function findMatchingTempMessageIndex(messages, message) {
+    const senderId = getSenderId(message);
+    return messages.findIndex((m) => (
+        m._temp &&
+        m.content === message.content &&
+        getSenderId(m) === senderId
+    ));
+}
+
+function sortMessagesByCreatedAt(messages) {
+    messages.sort((a, b) => {
+        const aTime = new Date(a.createdAt || 0).getTime();
+        const bTime = new Date(b.createdAt || 0).getTime();
+        return aTime - bTime;
+    });
+}
+
+function mergeMessages(messages, incomingMessages) {
+    incomingMessages.forEach((message) => {
+        if (!message?._id) return;
+
+        const existingIdx = messages.findIndex((m) => m._id === message._id);
+        if (existingIdx !== -1) {
+            messages[existingIdx] = message;
+            return;
+        }
+
+        const tempIdx = findMatchingTempMessageIndex(messages, message);
+        if (tempIdx !== -1) {
+            messages[tempIdx] = message;
+            return;
+        }
+
+        messages.push(message);
+    });
+
+    sortMessagesByCreatedAt(messages);
+}
+
 // Async thunk to fetch the user's chat list
 export const fetchChats = createAsyncThunk("chat/fetchChats", async (_, { rejectWithValue }) => {
     try {
@@ -125,29 +168,42 @@ const chatSlice = createSlice({
             delete state.onlineUsers[action.payload];
         },
 
-        // Socket event: received a new message via real-time
-        socketMessageReceived: (state, action) => {
-            const { chatId, message } = action.payload;
-            if (!message?._id) return;
+            // Socket event: received a new message via real-time
+            socketMessageReceived: (state, action) => {
+                const { chatId, message, chat: incomingChat } = action.payload;
+                if (!message?._id) return;
 
             // Initialize chat messages bucket if needed
             if (!state.messagesByChat[chatId]) {
                 state.messagesByChat[chatId] = { messages: [], loading: false, error: null, loaded: false };
             }
 
-            // Skip if message already exists (e.g. sender's own message from optimistic UI)
-            const exists = state.messagesByChat[chatId].messages.some((m) => m._id === message._id);
+            const msgs = state.messagesByChat[chatId].messages;
+
+            // Skip if the real message already exists. This can happen because the
+            // sender receives both the REST response and the socket broadcast.
+            const exists = msgs.some((m) => m._id === message._id);
             if (exists) return;
 
-            // Append the new message
-            state.messagesByChat[chatId].messages.push(message);
+            const tempIdx = findMatchingTempMessageIndex(msgs, message);
+            if (tempIdx !== -1) {
+                msgs[tempIdx] = message;
+            } else {
+                // Append the new message
+                msgs.push(message);
+            }
 
-            // Update the chat's lastMessage in the chat list
+
+            // Update or insert the chat row. For brand-new direct chats, recipients
+            // learn about the chat from this socket payload before they can join it.
             const chat = state.chats.find((c) => c._id === chatId);
-            if (chat) {
+            if (incomingChat?._id) {
+                incomingChat.lastMessage = message;
+                incomingChat.updatedAt = message.createdAt;
+                state.chats = [incomingChat, ...state.chats.filter((c) => c._id !== chatId)];
+            } else if (chat) {
                 chat.lastMessage = message;
                 chat.updatedAt = message.createdAt;
-                // Move this chat to the top of the list
                 state.chats = [chat, ...state.chats.filter((c) => c._id !== chatId)];
             }
 
@@ -233,7 +289,7 @@ const chatSlice = createSlice({
                 }
                 state.messagesByChat[chatId].loading = false;
                 state.messagesByChat[chatId].loaded = true;
-                state.messagesByChat[chatId].messages = messages;
+                mergeMessages(state.messagesByChat[chatId].messages, messages);
             })
             .addCase(fetchMessages.rejected, (state, action) => {
                 const { chatId } = action.meta.arg;
@@ -246,18 +302,19 @@ const chatSlice = createSlice({
             })
 
             .addCase(sendMessage.pending, (state, action) => {
-                const { chatId, content } = action.meta.arg;
+                const { chatId, content, sender } = action.meta.arg;
                 if (!state.messagesByChat[chatId]) {
                     state.messagesByChat[chatId] = { messages: [], loading: false, error: null, loaded: false };
                 }
                 state.messagesByChat[chatId].messages.push({
-                    _id: `temp-${Date.now()}`,
+                    _id: `temp-${action.meta.requestId}`,
                     chatId,
-                    senderId: { _id: "", name: "", profilePic: "" },
+                    senderId: sender || { _id: "", name: "", profilePic: "" },
                     content,
                     status: "sending",
                     createdAt: new Date().toISOString(),
                     _temp: true,
+                    _requestId: action.meta.requestId,
                 });
             })
             .addCase(sendMessage.fulfilled, (state, action) => {
@@ -265,10 +322,16 @@ const chatSlice = createSlice({
                 if (!state.messagesByChat[chatId]) return;
 
                 const msgs = state.messagesByChat[chatId].messages;
-                const idx = msgs.findIndex((m) => m._temp);
-                if (idx !== -1) {
-                    // Replace optimistic with real (will be deduped when socket event arrives)
-                    msgs[idx] = message;
+                const existingIdx = msgs.findIndex((m) => m._id === message._id);
+                const tempIdx = msgs.findIndex((m) => m._requestId === action.meta.requestId);
+
+                if (existingIdx !== -1 && tempIdx !== -1 && existingIdx !== tempIdx) {
+                    msgs[existingIdx] = message;
+                    msgs.splice(tempIdx, 1);
+                } else if (tempIdx !== -1) {
+                    msgs[tempIdx] = message;
+                } else if (existingIdx !== -1) {
+                    msgs[existingIdx] = message;
                 } else {
                     msgs.push(message);
                 }
@@ -284,7 +347,7 @@ const chatSlice = createSlice({
                 const { chatId } = action.meta.arg;
                 if (!state.messagesByChat[chatId]) return;
                 state.messagesByChat[chatId].messages = state.messagesByChat[chatId].messages.filter(
-                    (m) => !m._temp
+                    (m) => m._requestId !== action.meta.requestId
                 );
                 state.messagesByChat[chatId].error = action.payload;
             });

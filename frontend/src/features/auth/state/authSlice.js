@@ -220,8 +220,9 @@ const authSlice = createSlice({
                 state.user = action.payload.data;
 
                 // Storing access token if present
-                if (action.payload.accessToken) {
-                    setAccessToken(action.payload.accessToken);
+                const accessToken = action.payload?.data?.accesstoken || action.payload?.accessToken;
+                if (accessToken) {
+                    setAccessToken(accessToken);
                 }
             })
 
@@ -243,8 +244,9 @@ const authSlice = createSlice({
                 state.user = action.payload.data;
 
                 // Storing access token if present
-                if (action.payload.accessToken) {
-                    setAccessToken(action.payload.accessToken);
+                const accessToken = action.payload?.data?.accesstoken || action.payload?.accessToken;
+                if (accessToken) {
+                    setAccessToken(accessToken);
                 }
             })
 

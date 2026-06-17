@@ -41,6 +41,8 @@ function ChatPanel({ selectedChat, currentUserId, onBack }) {
         return state.chat.messagesByChat[selectedChat._id] || null;
     });
 
+    const currentUser = useSelector((state) => state.auth.user);
+
     // Online status of the other user
     const isOnline = useSelector((state) => {
         if (!selectedChat || selectedChat.chatType === "group") return false;
@@ -71,11 +73,6 @@ function ChatPanel({ selectedChat, currentUserId, onBack }) {
 
         // Only fetch if this is a new chat selection
         if (prevChatIdRef.current !== selectedChat._id) {
-            // Clear previous chat's active state
-            if (prevChatIdRef.current) {
-                emit("leave_chat", prevChatIdRef.current);
-            }
-
             prevChatIdRef.current = selectedChat._id;
             dispatch(setActiveChat(selectedChat._id));
             dispatch(fetchMessages({ chatId: selectedChat._id }));
@@ -92,9 +89,6 @@ function ChatPanel({ selectedChat, currentUserId, onBack }) {
     useEffect(() => {
         return () => {
             dispatch(clearActiveChat());
-            if (prevChatIdRef.current) {
-                emit("leave_chat", prevChatIdRef.current);
-            }
         };
     }, [dispatch]);
 
@@ -146,7 +140,15 @@ function ChatPanel({ selectedChat, currentUserId, onBack }) {
         const trimmed = text.trim();
         if (!trimmed || !selectedChat?._id) return;
 
-        dispatch(sendMessage({ chatId: selectedChat._id, content: trimmed }));
+        dispatch(sendMessage({
+            chatId: selectedChat._id,
+            content: trimmed,
+            sender: {
+                _id: currentUserId,
+                name: currentUser?.name || "",
+                profilePic: currentUser?.profilePic || "",
+            },
+        }));
         setText("");
 
         // Stop typing indicator

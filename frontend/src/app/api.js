@@ -45,7 +45,11 @@ api.interceptors.response.use(
         const originalRequest = error.config;
 
         // Checking if error is 401 or 403 and request hasn't been retried
-        if ((error.response?.status === 401 || error.response?.status === 403) && !originalRequest._retry) {
+        if (
+            (error.response?.status === 401 || error.response?.status === 403) &&
+            !originalRequest._retry &&
+            !originalRequest.skipAuthRedirect
+        ) {
 
             // Marking request as retried
             originalRequest._retry = true;
@@ -75,7 +79,10 @@ api.interceptors.response.use(
 
                 // Refresh failed — clear token and redirect to login
                 clearAccessToken();
-                if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
+                const authPages = ["/login", "/signup", "/forgotpassword", "/resetpassword"];
+                const isAuthPage = typeof window !== "undefined" &&
+                    authPages.some((path) => window.location.pathname.startsWith(path));
+                if (typeof window !== "undefined" && !isAuthPage) {
                     window.location.href = "/login";
                 }
             }

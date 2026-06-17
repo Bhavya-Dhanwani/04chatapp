@@ -20,7 +20,7 @@ export default function AuthRoute({ children }) {
     const router = useRouter();
 
     // Fetching current user data
-    const { user, loading } = useMe();
+    const { user, loading } = useMe({ skipAuthRedirect: true });
 
     // Getting user from redux state
     const { user: reduxUser } = useSelector((state) => state.auth);

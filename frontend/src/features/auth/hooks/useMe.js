@@ -1,5 +1,5 @@
 // Importing useEffect hook from react
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // Importing hooks from react-redux
 import { useDispatch, useSelector } from "react-redux";
@@ -11,7 +11,9 @@ import api from "../../../app/api";
 import { setUser, clearUser } from "../state/authSlice";
 
 // Custom hook to fetch and manage current user data
-export function useMe() {
+export function useMe({ skipAuthRedirect = false } = {}) {
+
+    const [checking, setChecking] = useState(false);
 
     // Getting dispatch function from redux
     const dispatch = useDispatch();
@@ -27,10 +29,11 @@ export function useMe() {
 
         // Async function to fetch user data
         const fetchUser = async () => {
+            setChecking(true);
             try {
 
                 // Making GET request to /auth/me endpoint
-                const { data } = await api.get("/auth/me");
+                const { data } = await api.get("/auth/me", { skipAuthRedirect });
 
                 // Updating user state if not cancelled
                 if (!cancelled) {
@@ -41,6 +44,10 @@ export function useMe() {
                 // Clearing user state on error if not cancelled
                 if (!cancelled) {
                     dispatch(clearUser());
+                }
+            } finally {
+                if (!cancelled) {
+                    setChecking(false);
                 }
             }
         };
@@ -54,8 +61,8 @@ export function useMe() {
         return () => {
             cancelled = true;
         };
-    }, [dispatch, user]);
+    }, [dispatch, user, skipAuthRedirect]);
 
     // Returning user and loading state
-    return { user, loading };
+    return { user, loading: loading || checking };
 }

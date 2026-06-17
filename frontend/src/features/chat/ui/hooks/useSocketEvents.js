@@ -54,6 +54,14 @@ export default function useSocketEvents() {
         });
     }, []);
 
+    useEffect(() => {
+        chats.forEach((chat) => {
+            if (chat?._id) {
+                emit("join_chat", chat._id);
+            }
+        });
+    }, [chats]);
+
     // Connect socket on mount, disconnect on unmount
     useEffect(() => {
         if (!user) return;
