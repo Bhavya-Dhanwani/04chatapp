@@ -45,8 +45,11 @@ async function accessOrCreateChatService(userId, otherUserId) {
         throw new ApiError(404, "User not found");
     }
 
-    // Looking for an existing 1:1 chat containing both users and exactly two participants
+    // Looking for an existing 1:1 direct chat containing both users and exactly two participants.
+    // The chatType guard prevents the Global group from matching when it happens
+    // to contain the same two users.
     let chat = await chatModel.findOne({
+        chatType: "direct",
         participants: { $all: [userId, otherUserId], $size: 2 }
     });
 

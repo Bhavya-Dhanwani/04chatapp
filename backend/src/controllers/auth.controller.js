@@ -37,6 +37,7 @@ async function signupController(req, res) {
     res.cookie("chat_refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
         path: "/api/auth"
     });
 
@@ -64,6 +65,7 @@ async function loginController(req, res) {
     res.cookie("chat_refresh_token", refreshToken, {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
         path: "/api/auth"
     });
 
@@ -197,6 +199,7 @@ async function refreshController(req, res) {
     res.cookie("chat_refresh_token", newRefreshToken, {
         httpOnly: true,
         secure: true,
+        sameSite: "none",
         path: "/api/auth"
     });
 

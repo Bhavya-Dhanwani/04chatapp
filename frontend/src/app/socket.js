@@ -2,6 +2,8 @@
 import { io } from "socket.io-client";
 import { getAccessToken } from "./tokenStore";
 
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "https://zero4chatapp.onrender.com";
+
 // The Socket.IO client instance
 let socket = null;
 
@@ -13,9 +15,10 @@ function connectSocket() {
     const token = getAccessToken();
     if (!token || (socket && socket.connected)) return socket;
 
-    socket = io("http://localhost:5000", {
+    socket = io(SOCKET_URL, {
         auth: { token },
         autoConnect: false,
+        withCredentials: true,
     });
 
     socket.on("connect", () => {

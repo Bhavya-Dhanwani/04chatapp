@@ -4,9 +4,11 @@ import axios from "axios";
 // Importing token management utilities
 import { getAccessToken, setAccessToken, clearAccessToken } from "./tokenStore";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://zero4chatapp.onrender.com/api";
+
 // Creating axios instance with default configuration
 const api = axios.create({
-    baseURL: "https://zero4chatapp.onrender.com/api",
+    baseURL: API_BASE_URL,
     headers: {
         "Content-Type": "application/json",
     },
@@ -52,7 +54,7 @@ api.interceptors.response.use(
 
                 // Attempting to refresh token
                 const { data } = await axios.post(
-                    "http://localhost:5000/api/auth/refresh",
+                    `${API_BASE_URL}/auth/refresh`,
                     {},
                     { withCredentials: true }
                 );

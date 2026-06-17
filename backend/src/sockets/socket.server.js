@@ -1,7 +1,7 @@
 // importing the modules
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
-import { ACCESS_SECRET } from "../config/env.config.js";
+import { ACCESS_SECRET, FRONTEND_URL } from "../config/env.config.js";
 import chatModel from "../models/chat.model.js";
 
 // The Socket.IO server instance (set during initSocket)
@@ -10,14 +10,27 @@ let io;
 // Map of userId -> Set of socketIds (supports multiple tabs per user)
 const onlineUsers = new Map();
 
+const DEFAULT_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+];
+
+const allowedOrigins = new Set(
+    [FRONTEND_URL, ...DEFAULT_ALLOWED_ORIGINS]
+        .flatMap((origin) => String(origin || "").split(","))
+        .map((origin) => origin.trim())
+        .filter(Boolean)
+);
+
 // Function to initialize and connect to the socket
 function initSocket(httpServer) {
 
     // Making the server with CORS
     io = new Server(httpServer, {
         cors: {
-            origin: "*",
-            methods: ["GET", "POST"]
+            origin: Array.from(allowedOrigins),
+            methods: ["GET", "POST"],
+            credentials: true
         }
     });
 
