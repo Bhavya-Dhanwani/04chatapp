@@ -19,12 +19,15 @@ export default function StoreProvider({ children }) {
     const storeRef = useRef(null);
 
     // Initializing store if not already done
+    // eslint-disable-next-line react-hooks/refs
     if (!storeRef.current) {
+        // eslint-disable-next-line react-hooks/refs
         storeRef.current = makeStore();
     }
 
     // Rendering providers
     return (
+        // eslint-disable-next-line react-hooks/refs
         <Provider store={storeRef.current}>
             <ToastProvider>{children}</ToastProvider>
         </Provider>
