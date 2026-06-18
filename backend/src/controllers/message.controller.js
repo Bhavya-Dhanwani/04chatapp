@@ -1,6 +1,7 @@
 // Importing modules
 import Apiresponse from "../utils/ApiResponse.util.js";
 import ApiError from "../utils/ApiError.util.js";
+import mongoose from "mongoose";
 import { sendMessageService, getMessagesService } from "../services/message.service.js";
 
 // Controller to send a message in a chat
@@ -9,6 +10,11 @@ async function sendMessageController(req, res) {
     // Reading chat id from params and content from body
     const { chatId } = req.params;
     const { content } = req.body;
+
+    // Guard: valid chatId is required
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+        throw new ApiError(400, "valid chatId is required");
+    }
 
     // Guard: content is required
     if (!content) {
@@ -27,6 +33,11 @@ async function getMessagesController(req, res) {
     // Reading chat id from params and pagination options from query
     const { chatId } = req.params;
     const { limit, before } = req.query;
+
+    // Guard: valid chatId is required
+    if (!mongoose.Types.ObjectId.isValid(chatId)) {
+        throw new ApiError(400, "valid chatId is required");
+    }
 
     // Fetching the messages
     const messages = await getMessagesService(chatId, req.user.id, { limit, before });

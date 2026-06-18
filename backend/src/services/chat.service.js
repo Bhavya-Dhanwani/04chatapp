@@ -25,7 +25,8 @@ async function getChatsService(userId) {
         .find({ participants: userId })
         .populate("participants", "name email profilePic isVerified")
         .populate("lastMessage")
-        .sort({ updatedAt: -1 });
+        .sort({ updatedAt: -1 })
+        .lean(); // .lean() converts Mongoose documents to plain JS objects, reducing memory overhead and improving read performance
 
     return chats;
 }

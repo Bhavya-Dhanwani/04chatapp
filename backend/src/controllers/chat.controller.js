@@ -1,6 +1,8 @@
+
 // Importing modules
 import Apiresponse from "../utils/ApiResponse.util.js";
 import ApiError from "../utils/ApiError.util.js";
+import mongoose from "mongoose";
 import { getChatsService, accessOrCreateChatService } from "../services/chat.service.js";
 
 // Controller to return the authenticated user's chat list
@@ -22,9 +24,9 @@ async function accessOrCreateChatController(req, res) {
     // Reading the other user's id from the body
     const { userId: otherUserId } = req.body;
 
-    // Guard: a target userId is required
-    if (!otherUserId) {
-        throw new ApiError(400, "userId is required");
+    // Guard: a target userId is required and valid
+    if (!otherUserId || !mongoose.Types.ObjectId.isValid(otherUserId)) {
+        throw new ApiError(400, "valid userId is required");
     }
 
     // Finding or creating the chat

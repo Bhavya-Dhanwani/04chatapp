@@ -88,10 +88,12 @@ async function searchUsersService(userId, query, limit = 10) {
 
     const safeLimit = Math.min(Math.max(Number(limit) || 10, 1), 20);
 
+    const escapedQuery = safeQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
     const users = await userModel
         .find({
             _id: { $ne: new mongoose.Types.ObjectId(userId) },
-            name: { $regex: safeQuery, $options: "i" }
+            name: { $regex: escapedQuery, $options: "i" }
         })
         .select("name profilePic isVerified")
         .limit(safeLimit)

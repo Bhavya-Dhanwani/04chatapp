@@ -1,5 +1,8 @@
 // Importing modules 
 import express from "express";
+import helmet from "helmet";
+import compression from "compression";
+import hpp from "hpp";
 import connectDB from "./config/db.config.js";
 import cookieParser from "cookie-parser";
 import corsMiddleware from "./middlewares/cors.middleware.js";
@@ -14,6 +17,9 @@ connectDB();
 
 // Adding the middleware
 app.use(corsMiddleware);
+app.use(helmet());
+app.use(compression());
+app.use(hpp());
 app.use(express.json());
 app.use(cookieParser());
 
